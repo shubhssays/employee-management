@@ -114,7 +114,7 @@ async def require_admin(
 ) -> CurrentUser:
     """Allow only ADMIN role. Returns CurrentUser for further use."""
     if current_user.role != UserRole.ADMIN:
-        raise ForbiddenError("Admin privileges are required.")
+        raise ForbiddenError(f"Role '{current_user.role}' does not have access to this resource.")
     return current_user
 
 
@@ -122,8 +122,8 @@ async def require_manager_or_admin(
     current_user: Annotated[CurrentUser, Depends(get_current_user)],
 ) -> CurrentUser:
     """Allow MANAGER or ADMIN role. Returns CurrentUser for further use."""
-    if current_user.role == UserRole.EMPLOYEE:
-        raise ForbiddenError("Manager or Admin privileges are required.")
+    if current_user.role not in [UserRole.MANAGER, UserRole.ADMIN]:
+        raise ForbiddenError(f"Role '{current_user.role}' does not have access to this resource.")
     return current_user
 
 

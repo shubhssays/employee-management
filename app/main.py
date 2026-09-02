@@ -73,7 +73,7 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
         logger.info("database_connected")
     except Exception as exc:
         logger.error("database_connection_failed", exc_info=exc)
-        # Do not raise — let the app start so health checks can report the issue
+        raise exc
 
     # TODO (Phase 1 enhancement): Start APScheduler here
     # if settings.SCHEDULER_ENABLED:
