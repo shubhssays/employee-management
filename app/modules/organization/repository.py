@@ -36,11 +36,11 @@ class OrganizationRepository:
         where_clause = None
 
         if id is not None:
-            where_clause = Organization.id == id
+            condition = Organization.id == id
         else:
-            where_clause = Organization.slug == slug
+            condition = Organization.slug == slug
 
-        result = await self.db.execute(select(Organization).where(where_clause))
+        result = await self.db.execute(select(Organization).where(condition))
         return result.scalar_one_or_none()
 
     async def get_all(self, params: dict) -> dict:

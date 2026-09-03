@@ -2,19 +2,21 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.dependencies import CurrentUser
 from app.core.logging import get_logger
-from app.modules import organization
+from app.modules.organization.exceptions import OrganizationSlugConflictError, OrganizationNotFoundError, \
+    OrganizationValidationError
 from app.modules.organization.models import Organization
 from app.modules.organization.repository import OrganizationRepository
-from app.modules.organization.exceptions import OrganizationSlugConflictError, OrganizationNotFoundError, OrganizationValidationError
-from app.modules.organization.schemas import OrganizationCreate, OrganizationUpdate, OrganizationGetList, OrganizationListResponse
+from app.modules.organization.schemas import OrganizationCreate, OrganizationUpdate, OrganizationGetList, \
+    OrganizationListResponse
 
 logger = get_logger(__name__)
 
 import math
 
+
 class OrganizationService:
-    
-    def __init__(self, db: AsyncSession, current_user: CurrentUser):
+
+    def __init__(self, db: AsyncSession, current_user: CurrentUser) -> None:
         self.db = db
         self.repo = OrganizationRepository(db)
         current_user_dict = {
@@ -24,7 +26,7 @@ class OrganizationService:
         }
         self.user = current_user or CurrentUser(**current_user_dict)
 
-    async def create_organization(self, data: OrganizationCreate):
+    async def create_organization(self, data: OrganizationCreate) -> Organization:
         async with self.db.begin():
             existing = await self.repo.get_by(None, data.slug)
             if existing:
@@ -40,7 +42,7 @@ class OrganizationService:
             logger.info("Organization created successfully: %s", new_organization)
             return new_organization
 
-    async def update_organization(self, organization_id: int, data: OrganizationUpdate):
+    async def update_organization(self, organization_id: int, data: OrganizationUpdate) -> Organization:
         async with self.db.begin():
             existing = await self.repo.get_by(organization_id, None)
             if not existing:
@@ -58,7 +60,8 @@ class OrganizationService:
 
     async def get_organization(self, params: OrganizationGetList) -> OrganizationListResponse:
         async with self.db.begin():
-            if (params.sort_by is None and params.sort_order is not None) or (params.sort_by is not None and params.sort_order is None):
+            if (params.sort_by is None and params.sort_order is not None) or (
+                    params.sort_by is not None and params.sort_order is None):
                 raise OrganizationValidationError("Provide sort_order and sort_by or None")
             logger.debug("incoming: %s", params)
             organizations, total = await self.repo.get_all(params.model_dump())

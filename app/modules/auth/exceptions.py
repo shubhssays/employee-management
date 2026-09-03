@@ -3,12 +3,14 @@ Auth module exceptions.
 
 Implementation: Phase 3
 """
+from typing import Any
 
 from app.core.exceptions import (
     AuthenticationError,
     ForbiddenError,
     InvalidCredentialsError,
     UnprocessableError,
+    NotFoundError
 )
 
 
@@ -38,3 +40,10 @@ class ResetTokenInvalidError(UnprocessableError):
 
     def __init__(self) -> None:
         super().__init__("Password reset token is invalid or has already been used.")
+
+class AdminNotFoundError(NotFoundError):
+    error_code = "ADMIN_NOT_FOUND"
+
+    def __init__(self) -> None:
+        super().__init__("Admin not found")
+

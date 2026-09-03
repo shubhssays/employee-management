@@ -1,5 +1,19 @@
-"""
-Pydantic request/response schemas for auth. Implement in Phase 3.
-"""
+from pydantic import BaseModel, ConfigDict, EmailStr, SecretStr
 
-# TODO (Phase 3): Implement.
+
+class AdminLogin(BaseModel):
+    """Prevents extra data in body"""
+    model_config = ConfigDict(extra="forbid")
+
+    email: str = EmailStr
+    password: str = SecretStr
+
+
+class AdminLoginResponse(BaseModel):
+    # Without this, we would have to manually map every field.
+    model_config = {"from_attributes": True}
+
+    id: int
+    email: str
+    name: str
+    token: str
