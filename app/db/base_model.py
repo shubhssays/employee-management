@@ -11,11 +11,10 @@ The 'id' is always a UUID to prevent sequential ID enumeration.
 All timestamps are stored in UTC (TIMESTAMPTZ in PostgreSQL).
 """
 
-import uuid
+
 from datetime import UTC, datetime
 
-from sqlalchemy import DateTime, text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import DateTime, text, Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -24,16 +23,14 @@ class Base(DeclarativeBase):
     Declarative base for all ORM models.
 
     Every table that inherits from Base automatically gets:
-        id          — UUID primary key
+        id          — int primary key
         created_at  — set on INSERT
         updated_at  — set on INSERT and every UPDATE
     """
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+    id: Mapped[int] = mapped_column(
+        Integer,
         primary_key=True,
-        default=uuid.uuid4,
-        server_default=text("gen_random_uuid()"),
     )
 
     created_at: Mapped[datetime] = mapped_column(
@@ -45,7 +42,7 @@ class Base(DeclarativeBase):
 
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(UTC),
+        default=None,
         server_default=text("NOW()"),
         onupdate=lambda: datetime.now(UTC),
         nullable=False,

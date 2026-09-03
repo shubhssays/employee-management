@@ -25,5 +25,7 @@ from app.db.base_model import Base  # noqa: F401
 # from app.modules.leave.models import (  # noqa: F401
 #     LeaveType, LeavePolicyRule, LeaveBalance, LeaveRecord
 # )
+from app.modules.auth.models import Admin  # noqa: F401
+from app.modules.organization.models import Organization  # noqa: F401
 
 __all__ = ["Base"]

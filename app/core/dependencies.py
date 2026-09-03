@@ -18,14 +18,13 @@ This keeps routers and services decoupled from SQLAlchemy model internals.
 """
 
 from typing import Annotated
-from uuid import UUID
 
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.enums import UserRole
+from app.core.enums import AdminRole, UserRole
 from app.core.exceptions import (
     AuthenticationError,
     ForbiddenError,
@@ -52,16 +51,14 @@ class CurrentUser(BaseModel):
     Services receive this object to perform authorization checks.
 
     Attributes:
-        user_id:          UUID of the User record (auth identity)
-        organization_id:  UUID of the tenant the user belongs to
-        employee_id:      UUID of the Employee record (HR profile)
+        user_id:          int of the User record (auth identity)
+        organization_id:  int of the tenant the user belongs to
         role:             Role enum (ADMIN | MANAGER | EMPLOYEE)
     """
 
-    user_id: UUID
-    organization_id: UUID
-    employee_id: UUID
-    role: UserRole
+    user_id: int
+    organization_id: int
+    role: UserRole | AdminRole
 
 
 # ---------------------------------------------------------------------------
@@ -95,9 +92,8 @@ async def get_current_user(
 
     try:
         return CurrentUser(
-            user_id=UUID(payload["sub"]),
-            organization_id=UUID(payload["org"]),
-            employee_id=UUID(payload["emp"]),
+            user_id=int(payload["sub"]),
+            organization_id=int(payload["org"]),
             role=UserRole(payload["role"]),
         )
     except (KeyError, ValueError) as exc:
@@ -113,7 +109,7 @@ async def require_admin(
     current_user: Annotated[CurrentUser, Depends(get_current_user)],
 ) -> CurrentUser:
     """Allow only ADMIN role. Returns CurrentUser for further use."""
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != AdminRole.ADMIN:
         raise ForbiddenError(f"Role '{current_user.role}' does not have access to this resource.")
     return current_user
 
@@ -122,7 +118,7 @@ async def require_manager_or_admin(
     current_user: Annotated[CurrentUser, Depends(get_current_user)],
 ) -> CurrentUser:
     """Allow MANAGER or ADMIN role. Returns CurrentUser for further use."""
-    if current_user.role not in [UserRole.MANAGER, UserRole.ADMIN]:
+    if current_user.role not in [UserRole.MANAGER, AdminRole.ADMIN]:
         raise ForbiddenError(f"Role '{current_user.role}' does not have access to this resource.")
     return current_user
 

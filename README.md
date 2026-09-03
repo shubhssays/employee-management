@@ -100,11 +100,20 @@ uv run pytest tests/integration/test_health.py -v
 # Create a new migration after changing a model
 uv run alembic revision --autogenerate -m "describe_what_changed"
 
+# Create a manual data / master table migration
+uv run alembic revision -m "create_master_tables_and_seed_data"
+
 # Apply all pending migrations
 uv run alembic upgrade head
 
 # Roll back one migration
 uv run alembic downgrade -1
+
+# Roll back all migrations (wipe all Alembic-managed tables, indexes & data)
+uv run alembic downgrade base
+
+# Hard reset (completely wipe PostgreSQL docker volume & container)
+docker compose down -v && docker compose up -d db
 
 # Check current state
 uv run alembic current

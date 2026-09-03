@@ -7,11 +7,11 @@ modules and enforced by the authorization layer.
 
 import enum
 
+class AdminRole(enum.StrEnum):
+    ADMIN = "ADMIN"
 
 class UserRole(enum.StrEnum):
-    """The three fixed roles in the MVP permission model."""
-
-    ADMIN = "ADMIN"
+    """The two fixed roles in the MVP permission model."""
     MANAGER = "MANAGER"
     EMPLOYEE = "EMPLOYEE"
 

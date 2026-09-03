@@ -28,7 +28,7 @@ logger = structlog.get_logger(__name__)
 
 
 def _get_request_id(request: Request) -> str | None:
-    return request.headers.get("X-Request-ID")
+    return getattr(request.state, "request_id", None) or request.headers.get("X-Request-ID")
 
 
 async def app_exception_handler(request: Request, exc: AppException) -> JSONResponse:

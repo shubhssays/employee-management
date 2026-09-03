@@ -33,6 +33,7 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: object) -> Response:
         # Use client-provided ID or generate a new one
         request_id = request.headers.get(REQUEST_ID_HEADER, f"req_{uuid.uuid4().hex[:12]}")
+        request.state.request_id = request_id
 
         # Bind to structlog context — all log entries during this request carry this ID
         structlog.contextvars.clear_contextvars()
