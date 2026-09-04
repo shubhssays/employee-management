@@ -19,12 +19,7 @@ class OrganizationService:
     def __init__(self, db: AsyncSession, current_user: CurrentUser) -> None:
         self.db = db
         self.repo = OrganizationRepository(db)
-        current_user_dict = {
-            "user_id": 1,
-            "organization_id": 1,
-            "role": "ADMIN"
-        }
-        self.user = current_user or CurrentUser(**current_user_dict)
+        self.user = current_user
 
     async def create_organization(self, data: OrganizationCreate) -> Organization:
         async with self.db.begin():

@@ -47,3 +47,18 @@ class AdminNotFoundError(NotFoundError):
     def __init__(self) -> None:
         super().__init__("Admin not found")
 
+
+class TokenNotFoundError(UnprocessableError):
+    error_code = "TOKEN_NOT_FOUND"
+
+    def __init__(self) -> None:
+        super().__init__("Token not found.")
+
+class TokenInvalidError(UnprocessableError):
+    error_code = "TOKEN_INVALID"
+
+    def __init__(self) -> None:
+        super().__init__("Token is invalid. Token must start with 'Bearer '")
+
+
+

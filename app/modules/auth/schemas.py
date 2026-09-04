@@ -16,4 +16,4 @@ class AdminLoginResponse(BaseModel):
     id: int
     email: str
     name: str
-    token: str
+    access_token: str

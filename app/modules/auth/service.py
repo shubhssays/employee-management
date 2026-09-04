@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.enums import AdminRole
 from app.core.logging import get_logger
 from app.core.security import verify_password, create_access_token
 from app.modules.auth.exceptions import InvalidCredentialsError, AccountDeactivatedError
@@ -32,8 +33,9 @@ class AuthService:
                 raise AccountDeactivatedError()
 
             result = {
-                "user_id": existing.id,
-                "email": existing.email,
+                "sub": str(existing.id),
+                "org": 0,  # Ideally, Admin is not linked to any org, but it is just for the sake of consistency
+                "role": AdminRole.ADMIN.value
             }
 
             token = create_access_token(result)
@@ -42,5 +44,5 @@ class AuthService:
                 id=existing.id,
                 email=existing.email,
                 name=existing.name,
-                token=token
+                access_token=token
             )

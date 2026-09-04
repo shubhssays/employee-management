@@ -32,10 +32,10 @@ class AppError(Exception):  # noqa: N818 — intentional base name
     error_code: str = "INTERNAL_SERVER_ERROR"
 
     def __init__(
-        self,
-        message: str | None = None,
-        details: Any = None,
-        error_code: str | None = None,
+            self,
+            message: str | None = None,
+            details: Any = None,
+            error_code: str | None = None,
     ) -> None:
         self.message = message or "An unexpected error occurred."
         self.details = details
@@ -77,6 +77,11 @@ class TokenExpiredError(AppException):
 class TokenInvalidError(AppException):
     status_code = 401
     error_code = "TOKEN_INVALID"
+
+
+class TokenNotFoundError(AppException):
+    status_code = 401
+    error_code = "TOKEN_NOT_FOUND"
 
 
 class RefreshTokenExpiredError(AppException):

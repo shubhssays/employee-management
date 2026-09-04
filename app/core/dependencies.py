@@ -34,6 +34,7 @@ from app.core.exceptions import (
 from app.core.security import decode_access_token
 from app.db.session import get_db  # noqa: F401 — re-exported for convenience
 
+
 # ---------------------------------------------------------------------------
 # Re-export get_db so callers can import from here or from db.session
 # ---------------------------------------------------------------------------
@@ -69,7 +70,7 @@ _bearer = HTTPBearer(auto_error=False)
 
 
 async def get_current_user(
-    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer)],
+        credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer)],
 ) -> CurrentUser:
     """
     Extract and validate the Bearer JWT from the Authorization header.
@@ -90,14 +91,21 @@ async def get_current_user(
     except (TokenExpiredError, TokenInvalidError) as exc:
         raise exc
 
+    user_role = None
+
     try:
-        return CurrentUser(
-            user_id=int(payload["sub"]),
-            organization_id=int(payload["org"]),
-            role=UserRole(payload["role"]),
-        )
-    except (KeyError, ValueError) as exc:
-        raise AuthenticationError("Token payload is malformed.") from exc
+        user_role = AdminRole(payload["role"])
+    except ValueError:
+        try:
+            user_role = UserRole(payload["role"])
+        except (KeyError, ValueError) as exc:
+            raise AuthenticationError("Token payload is malformed.") from exc
+
+    return CurrentUser(
+        user_id=int(payload["sub"]),
+        organization_id=int(payload.get("org", 0)),
+        role=user_role,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -106,7 +114,7 @@ async def get_current_user(
 
 
 async def require_admin(
-    current_user: Annotated[CurrentUser, Depends(get_current_user)],
+        current_user: Annotated[CurrentUser, Depends(get_current_user)],
 ) -> CurrentUser:
     """Allow only ADMIN role. Returns CurrentUser for further use."""
     if current_user.role != AdminRole.ADMIN:
@@ -115,7 +123,7 @@ async def require_admin(
 
 
 async def require_manager_or_admin(
-    current_user: Annotated[CurrentUser, Depends(get_current_user)],
+        current_user: Annotated[CurrentUser, Depends(get_current_user)],
 ) -> CurrentUser:
     """Allow MANAGER or ADMIN role. Returns CurrentUser for further use."""
     if current_user.role not in [UserRole.MANAGER, AdminRole.ADMIN]:

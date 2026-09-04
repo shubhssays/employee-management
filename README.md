@@ -39,10 +39,22 @@ uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 Visit:
-- **API docs:** http://localhost:8000/api/v1/docs
+- **Swagger UI (Interactive API Docs):** http://localhost:8000/api/v1/docs
+- **ReDoc (Alternative Documentation):** http://localhost:8000/api/v1/redoc
+- **OpenAPI JSON Spec:** http://localhost:8000/api/v1/openapi.json
 - **Health check:** http://localhost:8000/api/v1/health
 
 ---
+
+## API Documentation & OpenAPI
+
+FastAPI automatically generates an OpenAPI 3.1.0 specification from your route handlers, Pydantic schemas, and dependencies:
+
+| Resource | URL | Description |
+|---|---|---|
+| **Swagger UI** | `http://localhost:8000/api/v1/docs` | Interactive API explorer to execute and test endpoints directly in the browser (supports Bearer JWT auth via the **Authorize 🔒** button). |
+| **ReDoc** | `http://localhost:8000/api/v1/redoc` | Clean, responsive, three-panel reference documentation. |
+| **OpenAPI Schema** | `http://localhost:8000/api/v1/openapi.json` | Raw OpenAPI JSON definition for client generation and tooling integration. |
 
 ## Project Structure
 
