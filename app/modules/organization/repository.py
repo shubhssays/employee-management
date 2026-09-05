@@ -53,14 +53,14 @@ class OrganizationRepository:
 
         conditions = []
 
-        if ids is not None and len(ids) > 0:
+        if ids:
             conditions.append(Organization.id.in_(ids))
 
-        if slugs is not None and len(slugs) > 0:
+        if slugs:
             conditions.append(Organization.slug.in_(slugs))
 
         sort_columns = {
-            "id":  Organization.id,
+            "id": Organization.id,
             "name": Organization.name,
             "slug": Organization.slug,
             "created_at": Organization.created_at,

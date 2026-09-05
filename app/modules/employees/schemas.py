@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr
 
@@ -49,8 +50,31 @@ class EmployeeUpdate(BaseModel):
 
     first_name: str | None = Field(default=None, min_length=3, max_length=50, description="Employee Firstname")
     last_name: str | None = Field(default=None, min_length=3, max_length=50, description="Employee Lastname")
-    email: EmailStr | None = Field(default=None, description="Emmployee field")
+    email: EmailStr | None = Field(default=None, description="Employee field")
     mobile: str | None = Field(default=None, min_length=5, max_length=50, description="Employee Mobile")
     password: SecretStr | None = Field(default=None, description="Employee password")
     address: str | None = Field(default=None, min_length=5, max_length=200, description="Employee Address")
     is_active: bool | None = Field(default=None, description="Flags employee active or inactive")
+
+
+class EmployeeGetList(BaseModel):
+    ids: list[int] | None = Field(default=None, description="Id(s) of Employee")
+    organization_ids: list[int] | None = Field(default=None, description="Filter using organization_id(s)")
+    departments: list[str] | None = Field(default=None, description="Filter using department(s)")
+    email: str | None = Field(default=None, description="Search using email of Employee")
+    mobile: str | None = Field(default=None, description="Search using mobile of Employee")
+    first_name: str | None = Field(default=None, description="Search using first_name of Employee")
+    last_name: str | None = Field(default=None, description="Search using last_name of Employee")
+    page: int | None = Field(default=1, ge=1)
+    page_size: int | None = Field(default=20, ge=1, le=100)
+    sort_by: Literal[
+        "id", "organization_id", "department", "first_name", "last_name", "created_at", "updated_at"] = "created_at"
+    sort_order: Literal["asc", "desc"] = "desc"
+
+
+class EmployeeListResponse(BaseModel):
+    items: list[EmployeeDetailResponse]
+    total: int
+    page: int
+    page_size: int
+    pages: int

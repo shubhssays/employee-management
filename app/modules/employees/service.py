@@ -1,3 +1,5 @@
+import math
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.dependencies import CurrentUser
@@ -12,7 +14,8 @@ from app.modules.employees.exceptions import (
 )
 from app.modules.employees.models import Employee
 from app.modules.employees.repository import EmployeeRepository
-from app.modules.employees.schemas import EmployeeCreate, EmployeeDetailResponse, EmployeeUpdate
+from app.modules.employees.schemas import EmployeeCreate, EmployeeDetailResponse, EmployeeUpdate, EmployeeGetList, \
+    EmployeeListResponse
 
 logger = get_logger("__name__")
 
@@ -104,3 +107,22 @@ class EmployeeService:
 
             await self.repo.delete(existing)
             return None
+
+    async def get_list(self, params: EmployeeGetList) -> EmployeeListResponse:
+        async with self.db.begin():
+            if (params.sort_by is None and params.sort_order is not None) or (
+                    params.sort_by is not None and params.sort_order is None):
+                raise EmployeeValidationError("Provide sort_order and sort_by or None")
+
+            employees, total = await self.repo.get_list(params.model_dump())
+            page = params.page or 1
+            page_size = params.page_size or 20
+            pages = math.ceil(total / page_size) if page_size > 0 else 0
+
+            return EmployeeListResponse(
+                items=employees,
+                total=total,
+                page=page,
+                page_size=page_size,
+                pages=pages,
+            )

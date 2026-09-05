@@ -58,7 +58,6 @@ class OrganizationService:
             if (params.sort_by is None and params.sort_order is not None) or (
                     params.sort_by is not None and params.sort_order is None):
                 raise OrganizationValidationError("Provide sort_order and sort_by or None")
-            logger.debug("incoming: %s", params)
             organizations, total = await self.repo.get_all(params.model_dump())
             page = params.page or 1
             page_size = params.page_size or 20
