@@ -25,7 +25,7 @@ def upgrade() -> None:
         "organizations",
         sa.Column("id", sa.Integer, primary_key=True),
         sa.Column("name", sa.String, nullable=False),
-        sa.Column("slug", sa.String, nullable=False),
+        sa.Column("slug", sa.String, nullable=False, unique=True),
         sa.Column("is_active", sa.Boolean, nullable=False, server_default=sa.text("true")),
         sa.Column(
             "created_at",
@@ -33,7 +33,8 @@ def upgrade() -> None:
             nullable=False,
             server_default=sa.text("NOW()"),
         ),
-        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=True, server_default=None),
+        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=True, server_default=None,
+                  onupdate=sa.text("NOW()")),
         sa.Column(
             "created_by",
             sa.Integer,

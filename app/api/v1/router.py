@@ -20,6 +20,7 @@ from fastapi import APIRouter
 
 from app.api.v1.health import router as health_router
 from app.modules.auth.router import router as auth_router
+from app.modules.employees.router import router as employees_router
 from app.modules.organization.router import router as org_router
 
 # Placeholder imports — uncomment as modules are implemented:
@@ -39,7 +40,7 @@ api_router.include_router(health_router)
 # ── Business modules (uncomment when implemented) ─────────────────────────
 api_router.include_router(org_router, prefix="/organizations")
 api_router.include_router(auth_router, prefix="/auth")
-# api_router.include_router(employees_router,   prefix="/employees")
+api_router.include_router(employees_router, prefix="/employees")
 # api_router.include_router(work_router,        prefix="/work-entries")
 # api_router.include_router(attendance_router,  prefix="/attendance")
 # api_router.include_router(leave_router,       prefix="/leave")

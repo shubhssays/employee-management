@@ -7,8 +7,10 @@ modules and enforced by the authorization layer.
 
 import enum
 
+
 class AdminRole(enum.StrEnum):
     ADMIN = "ADMIN"
+
 
 class UserRole(enum.StrEnum):
     """The two fixed roles in the MVP permission model."""
@@ -40,3 +42,10 @@ class AllocationFrequency(enum.StrEnum):
     MONTHLY = "MONTHLY"
     QUARTERLY = "QUARTERLY"
     ANNUALLY = "ANNUALLY"
+
+
+class DepartmentType(enum.StrEnum):
+    DEVELOPER = "DEVELOPER"
+    SUPPORT = "SUPPORT"
+    HR = "HR"
+    MANAGEMENT = "MANAGEMENT"

@@ -17,8 +17,8 @@ class EmployeeNotFoundError(NotFoundError):
 class EmailAlreadyExistsError(ConflictError):
     error_code = "EMAIL_ALREADY_EXISTS"
 
-    def __init__(self) -> None:
-        super().__init__("An employee with this email already exists in the organization.")
+    def __init__(self, email: str) -> None:
+        super().__init__(f"An employee with this email '{email}' already exists in the organization.")
 
 
 class EmployeeAlreadyInactiveError(ConflictError):
