@@ -37,33 +37,9 @@ class EmployeeRepository:
                 or_(Employee.email == email_mob, Employee.mobile == email_mob)
             )
 
-        employee_columns = (
-            Employee.id,
-            Employee.first_name,
-            Employee.last_name,
-            Employee.password_hash,
-            Employee.email,
-            Employee.mobile,
-            Employee.address,
-            Employee.department,
-            Employee.organization_id,
-            Employee.is_active,
-            Employee.created_at,
-            Employee.updated_at
-        )
-
-        query = (
-            select(
-                *employee_columns,
-            )
-            .where(
-                or_(
-                    *conditions
-                )
-            )
-        )
-
-        result = await self.db.execute(query)
+        result = await self.db.execute(select(Employee).where(or_(
+            *conditions
+        )))
         return result.scalar_one_or_none()
 
     async def get_by_detailed(self, id: int | None, email_mob: str | None) -> EmployeeDetailResponse | None:
@@ -156,3 +132,10 @@ class EmployeeRepository:
             return None
 
         return EmployeeDetailResponse(**row._mapping)
+
+    async def update(self, emp: Employee, data: dict) -> Employee:
+        for field, value in data.items():
+            setattr(emp, field, value)
+        await self.db.flush()
+        # await self.db.refresh(emp) # we don't need because on service we are already refetching the data
+        return emp

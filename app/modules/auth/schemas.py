@@ -5,8 +5,8 @@ class AdminLogin(BaseModel):
     """Prevents extra data in body"""
     model_config = ConfigDict(extra="forbid")
 
-    email: str = EmailStr
-    password: str = SecretStr
+    email: EmailStr
+    password: SecretStr
 
 
 class AdminLoginResponse(BaseModel):

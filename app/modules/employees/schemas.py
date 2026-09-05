@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field, ConfigDict, EmailStr, SecretStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr
 
 from app.core.enums import DepartmentType
 
@@ -13,7 +13,7 @@ class EmployeeCreate(BaseModel):
     last_name: str = Field(min_length=3, max_length=50, description="Employee Lastname")
     email: EmailStr = Field(description="Emmployee field")
     mobile: str | None = Field(default=None, min_length=5, max_length=50, description="Employee Mobile")
-    password_hash: SecretStr = Field(description="Employee password")
+    password: SecretStr = Field(description="Employee password")
     address: str | None = Field(default=None, min_length=5, max_length=200, description="Employee Address")
     department: DepartmentType = Field("Employee Department")
     organization_id: int = Field(gt=0, description="Organization Id to which employee belongs to")
@@ -43,16 +43,14 @@ class EmployeeDetailResponse(EmployeeCreateResponse):
     updated_by_employee_name: str | None = None
 
 
-class EmployeeCreate(BaseModel):
+class EmployeeUpdate(BaseModel):
     """Prevents extra data in body"""
     model_config = ConfigDict(extra="forbid")
 
-    first_name: str = Field(min_length=3, max_length=50, description="Employee Firstname")
-    last_name: str = Field(min_length=3, max_length=50, description="Employee Lastname")
-    email: EmailStr = Field(description="Emmployee field")
+    first_name: str | None = Field(default=None, min_length=3, max_length=50, description="Employee Firstname")
+    last_name: str | None = Field(default=None, min_length=3, max_length=50, description="Employee Lastname")
+    email: EmailStr | None = Field(default=None, description="Emmployee field")
     mobile: str | None = Field(default=None, min_length=5, max_length=50, description="Employee Mobile")
-    password_hash: SecretStr = Field(description="Employee password")
+    password: SecretStr | None = Field(default=None, description="Employee password")
     address: str | None = Field(default=None, min_length=5, max_length=200, description="Employee Address")
-    department: DepartmentType = Field("Employee Department")
-    organization_id: int = Field(gt=0, description="Organization Id to which employee belongs to")
-
+    is_active: bool | None = Field(default=None, description="Flags employee active or inactive")

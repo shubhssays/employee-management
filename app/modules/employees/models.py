@@ -1,4 +1,5 @@
-from sqlalchemy import String, Integer, Boolean, ForeignKey, Index, Enum as SAEnum
+from sqlalchemy import Boolean, ForeignKey, Index, Integer, String
+from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.enums import DepartmentType

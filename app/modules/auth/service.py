@@ -2,8 +2,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.enums import AdminRole
 from app.core.logging import get_logger
-from app.core.security import verify_password, create_access_token
-from app.modules.auth.exceptions import InvalidCredentialsError, AccountDeactivatedError
+from app.core.security import create_access_token, verify_password
+from app.modules.auth.exceptions import AccountDeactivatedError, InvalidCredentialsError
 from app.modules.auth.repository import AuthRepository
 from app.modules.auth.schemas import AdminLogin, AdminLoginResponse
 
@@ -24,7 +24,7 @@ class AuthService:
 
             logger.debug("Existing: %s", existing)
 
-            password_match = verify_password(data.password, existing.password_hash)
+            password_match = verify_password(data.password.get_secret_value(), existing.password_hash)
 
             if not password_match:
                 raise InvalidCredentialsError()

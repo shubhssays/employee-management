@@ -4,7 +4,7 @@ Employees module exceptions.
 Implementation: Phase 4
 """
 
-from app.core.exceptions import ConflictError, NotFoundError, UnprocessableError
+from app.core.exceptions import BadRequestError, ConflictError, NotFoundError, UnprocessableError
 
 
 class EmployeeNotFoundError(NotFoundError):
@@ -26,6 +26,13 @@ class EmployeeAlreadyInactiveError(ConflictError):
 
     def __init__(self) -> None:
         super().__init__("This employee is already inactive.")
+
+
+class EmployeeValidationError(BadRequestError):
+    error_code = "BAD_REQUEST_ERROR"
+
+    def __init__(self, msg) -> None:
+        super().__init__(f"{msg}")
 
 
 class CannotDeactivateSoleAdminError(UnprocessableError):

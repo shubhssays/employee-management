@@ -34,7 +34,6 @@ from app.core.exceptions import (
 from app.core.security import decode_access_token
 from app.db.session import get_db  # noqa: F401 — re-exported for convenience
 
-
 # ---------------------------------------------------------------------------
 # Re-export get_db so callers can import from here or from db.session
 # ---------------------------------------------------------------------------

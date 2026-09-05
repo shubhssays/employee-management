@@ -14,7 +14,7 @@ All timestamps are stored in UTC (TIMESTAMPTZ in PostgreSQL).
 
 from datetime import UTC, datetime
 
-from sqlalchemy import DateTime, text, Integer
+from sqlalchemy import DateTime, Integer, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 

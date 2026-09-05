@@ -7,19 +7,17 @@ Create Date: 2026-09-04 13:04:43.258834
 Migration ownership: unknown
 """
 
-from typing import Sequence, Union
+from collections.abc import Sequence
 
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 from alembic import op
-
-from app.core.enums import DepartmentType
+from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision: str = '3079e5941675'
-down_revision: Union[str, None] = 'b1a3c0b5cc85'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = 'b1a3c0b5cc85'
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:

@@ -3,14 +3,13 @@ Auth module exceptions.
 
 Implementation: Phase 3
 """
-from typing import Any
 
 from app.core.exceptions import (
     AuthenticationError,
     ForbiddenError,
     InvalidCredentialsError,
+    NotFoundError,
     UnprocessableError,
-    NotFoundError
 )
 
 
