@@ -139,3 +139,8 @@ class EmployeeRepository:
         await self.db.flush()
         # await self.db.refresh(emp) # we don't need because on service we are already refetching the data
         return emp
+
+    async def delete(self, emp: Employee) -> None:
+        await self.db.delete(emp)
+        await self.db.flush()
+        return None

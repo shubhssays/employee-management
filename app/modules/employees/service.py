@@ -94,3 +94,13 @@ class EmployeeService:
             await self.repo.update(existing, emp_dict)
             updated_employee = await self.repo.get_by_detailed(existing.id, None)
             return updated_employee
+
+    async def delete_employee(self, emp_id: int) -> None:
+        async with self.db.begin():
+            existing = await self.repo.get_by(emp_id, None)
+
+            if not existing:
+                raise EmployeeNotFoundError()
+
+            await self.repo.delete(existing)
+            return None

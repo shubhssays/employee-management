@@ -52,3 +52,22 @@ async def update_employee(
     service = EmployeeService(db, current_user)
     employee = await service.update_employee(emp_id, body)
     return EmployeeDetailResponse.model_validate(employee)
+
+
+@router.delete(
+    "/{emp_id}",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete existing employee",
+    description=(
+            "Only admin and manager can delete the employee"
+    ),
+)
+async def delete_employee(
+        current_user: ManagerOrAdminDep,
+        emp_id: Annotated[int, Field(gt=0)],
+        db: DbSession
+) -> None:
+    service = EmployeeService(db, current_user)
+    await service.delete_employee(emp_id)
+    return None
