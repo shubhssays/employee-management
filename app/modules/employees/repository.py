@@ -19,7 +19,54 @@ class EmployeeRepository:
         await self.db.refresh(emp)
         return emp
 
-    async def get_by(self, id: int | None, email_mob: str | None) -> EmployeeDetailResponse | None:
+    async def get_by(self, id: int | None, email_mob: str | None) -> Employee | None:
+
+        if id is not None and email_mob is not None:
+            raise ValueError("Provide either id or email_mob, not both")
+
+        if id is None and email_mob is None:
+            raise ValueError("Provide anyone of them - id or email_mob")
+
+        conditions = []
+
+        if id is not None:
+            conditions.append(Employee.id == id)
+
+        if email_mob is not None:
+            conditions.append(
+                or_(Employee.email == email_mob, Employee.mobile == email_mob)
+            )
+
+        employee_columns = (
+            Employee.id,
+            Employee.first_name,
+            Employee.last_name,
+            Employee.password_hash,
+            Employee.email,
+            Employee.mobile,
+            Employee.address,
+            Employee.department,
+            Employee.organization_id,
+            Employee.is_active,
+            Employee.created_at,
+            Employee.updated_at
+        )
+
+        query = (
+            select(
+                *employee_columns,
+            )
+            .where(
+                or_(
+                    *conditions
+                )
+            )
+        )
+
+        result = await self.db.execute(query)
+        return result.scalar_one_or_none()
+
+    async def get_by_detailed(self, id: int | None, email_mob: str | None) -> EmployeeDetailResponse | None:
 
         if id is not None and email_mob is not None:
             raise ValueError("Provide either id or email_mob, not both")

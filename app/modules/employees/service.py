@@ -43,6 +43,6 @@ class EmployeeService:
 
             emp = Employee(**emp_dict)
             new_emp = await self.repo.create(emp)
-            existing = await self.repo.get_by(new_emp.id, None)
+            existing = await self.repo.get_by_detailed(new_emp.id, None)
             logger.info("Employee created successfully: %s", existing)
             return existing
