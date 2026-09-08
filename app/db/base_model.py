@@ -11,7 +11,6 @@ The 'id' is always a UUID to prevent sequential ID enumeration.
 All timestamps are stored in UTC (TIMESTAMPTZ in PostgreSQL).
 """
 
-
 from datetime import UTC, datetime
 
 from sqlalchemy import DateTime, Integer, text
@@ -43,7 +42,6 @@ class Base(DeclarativeBase):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=None,
-        server_default=text("NOW()"),
         onupdate=lambda: datetime.now(UTC),
-        nullable=False,
+        nullable=True,
     )

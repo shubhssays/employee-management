@@ -14,13 +14,12 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = '068909d5b7e7'
-down_revision: str | None = '7a8916fb2031'
+down_revision: str | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
-
     # Create Roles Table
     op.create_table(
         "roles",
@@ -30,7 +29,7 @@ def upgrade() -> None:
         sa.Column("description", sa.String(200), nullable=False),
         sa.Column("is_active", sa.Boolean, nullable=False, server_default=sa.text("true")),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("NOW()")),
-        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("NOW()")),
+        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=True),
     )
 
     op.create_index("idx_roles_slug", "roles", ["slug"])
@@ -40,9 +39,9 @@ def upgrade() -> None:
     op.bulk_insert(
         sa.table(
             "roles",
-            sa.column("slug", sa.String),
-            sa.column("name", sa.String),
-            sa.column("description", sa.String),
+            sa.column("slug", sa.String(50)),
+            sa.column("name", sa.String(50)),
+            sa.column("description", sa.String(500)),
             sa.column("is_active", sa.Boolean),
         ),
         [
@@ -96,7 +95,6 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-
     op.drop_index("idx_roles_slug", table_name="roles")
     op.drop_index("idx_roles_name", table_name="roles")
     op.drop_table("roles")

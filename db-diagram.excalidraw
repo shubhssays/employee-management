@@ -8,8 +8,8 @@
       "type": "rectangle",
       "x": 291.6189451501051,
       "y": 54.7049348990129,
-      "width": 164.35016466872426,
-      "height": 240.13644745797887,
+      "width": 141.96294590041717,
+      "height": 195.2175333964154,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -25,8 +25,8 @@
         "type": 3
       },
       "seed": 45982809,
-      "version": 314,
-      "versionNonce": 149830061,
+      "version": 369,
+      "versionNonce": 1678784109,
       "isDeleted": false,
       "boundElements": [
         {
@@ -34,7 +34,7 @@
           "type": "arrow"
         }
       ],
-      "updated": 1788324997605,
+      "updated": 1788796455367,
       "link": null,
       "locked": false
     },
@@ -81,7 +81,7 @@
       "x": 309.70802945252973,
       "y": 65.21022833444246,
       "width": 115.19992065429688,
-      "height": 225,
+      "height": 175,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -95,8 +95,8 @@
       "index": "a2",
       "roundness": null,
       "seed": 1439192921,
-      "version": 348,
-      "versionNonce": 647934509,
+      "version": 370,
+      "versionNonce": 1797479907,
       "isDeleted": false,
       "boundElements": [
         {
@@ -104,16 +104,16 @@
           "type": "arrow"
         }
       ],
-      "updated": 1788324993264,
+      "updated": 1788796447195,
       "link": null,
       "locked": false,
-      "text": "id\nslug\nname\ndescription\ncreated_at\nupdated_at\ncreated_by\nupdated_by\nunique(slug)",
+      "text": "id\nslug\nname\ndescription\ncreated_at\nupdated_at\nunique(slug)",
       "fontSize": 20,
       "fontFamily": 5,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "id\nslug\nname\ndescription\ncreated_at\nupdated_at\ncreated_by\nupdated_by\nunique(slug)",
+      "originalText": "id\nslug\nname\ndescription\ncreated_at\nupdated_at\nunique(slug)",
       "autoResize": false,
       "lineHeight": 1.25
     },
@@ -468,8 +468,8 @@
       "type": "rectangle",
       "x": 308.2083950770035,
       "y": 814.5463461455688,
-      "width": 260.1000337458694,
-      "height": 254.47055242081638,
+      "width": 260.1221090245713,
+      "height": 208.9635917812932,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -485,11 +485,11 @@
         "type": 3
       },
       "seed": 1766320887,
-      "version": 462,
-      "versionNonce": 18058199,
+      "version": 500,
+      "versionNonce": 1571579709,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1788314369524,
+      "updated": 1788801058199,
       "link": null,
       "locked": false
     },
@@ -694,7 +694,7 @@
       "x": 330.52409006302787,
       "y": 829.4277835840808,
       "width": 219.81983947753906,
-      "height": 225,
+      "height": 175,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -708,8 +708,8 @@
       "index": "aX",
       "roundness": null,
       "seed": 1477518583,
-      "version": 226,
-      "versionNonce": 2073602757,
+      "version": 231,
+      "versionNonce": 1418355581,
       "isDeleted": false,
       "boundElements": [
         {
@@ -721,16 +721,16 @@
           "type": "arrow"
         }
       ],
-      "updated": 1788507388196,
+      "updated": 1788801052927,
       "link": null,
       "locked": false,
-      "text": "id\nemp_id FK\nrole_id FK\nactive BOOL\ncreated_by \nupdated_by\ncreated_at\nupdated_at\nunique(emp_id, role_id)",
+      "text": "id\nemp_id FK\nrole_id FK\nis_active BOOL\ncreated_at\nupdated_at\nunique(emp_id, role_id)",
       "fontSize": 20,
       "fontFamily": 5,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "id\nemp_id FK\nrole_id FK\nactive BOOL\ncreated_by \nupdated_by\ncreated_at\nupdated_at\nunique(emp_id, role_id)",
+      "originalText": "id\nemp_id FK\nrole_id FK\nis_active BOOL\ncreated_at\nupdated_at\nunique(emp_id, role_id)",
       "autoResize": true,
       "lineHeight": 1.25
     },
@@ -903,7 +903,7 @@
       "x": 328.53731273845756,
       "y": 392.9524546027185,
       "width": 109.0065929011788,
-      "height": 521.2456963808245,
+      "height": 511.29672584761056,
       "angle": 0,
       "strokeColor": "#2f9e44",
       "backgroundColor": "transparent",
@@ -917,11 +917,11 @@
       "index": "ae",
       "roundness": null,
       "seed": 1150616025,
-      "version": 326,
-      "versionNonce": 1927578053,
+      "version": 331,
+      "versionNonce": 197848029,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1788507575232,
+      "updated": 1788801052928,
       "link": null,
       "locked": false,
       "points": [
@@ -939,11 +939,11 @@
         ],
         [
           -109.0065929011788,
-          481.2456963808245
+          471.29672584761056
         ],
         [
           -26.823912770950017,
-          481.2456963808245
+          471.29672584761056
         ]
       ],
       "lastCommittedPoint": null,
@@ -977,7 +977,7 @@
           ],
           "end": [
             -109.0065929011788,
-            481.2456963808245
+            471.29672584761056
           ]
         }
       ],
@@ -988,9 +988,9 @@
       "id": "Cwb4pZI44Gqc-bP5emqjC",
       "type": "arrow",
       "x": 299.3773399084632,
-      "y": 82.40919625225061,
+      "y": 78.58720338162658,
       "width": 80.18178578562595,
-      "height": 820.0386363770646,
+      "height": 807.633951682081,
       "angle": 0,
       "strokeColor": "#2f9e44",
       "backgroundColor": "transparent",
@@ -1004,11 +1004,11 @@
       "index": "af",
       "roundness": null,
       "seed": 640996663,
-      "version": 408,
-      "versionNonce": 1428585861,
+      "version": 435,
+      "versionNonce": 781936701,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1788507388198,
+      "updated": 1788801052928,
       "link": null,
       "locked": false,
       "points": [
@@ -1022,11 +1022,11 @@
         ],
         [
           -80.18178578562595,
-          820.0386363770646
+          807.633951682081
         ],
         [
           -13.21701190687429,
-          820.0386363770646
+          807.633951682081
         ]
       ],
       "lastCommittedPoint": null,
@@ -1060,7 +1060,7 @@
           ],
           "end": [
             -80.18178578562595,
-            820.0386363770646
+            807.633951682081
           ]
         }
       ],

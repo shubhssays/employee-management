@@ -3,6 +3,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
+from app.modules.EmployeeRoles.models import EmployeeRoles
+from app.modules.Roles.models import Roles
 from app.modules.auth.models import Admin
 from app.modules.employees.models import Employee
 from app.modules.employees.schemas import EmployeeDetailResponse
@@ -72,14 +74,26 @@ class EmployeeRepository:
             func.concat_ws(" ", created_employee.first_name, created_employee.last_name).label(
                 "created_by_employee_name"),
             func.concat_ws(" ", updated_employee.first_name, updated_employee.last_name).label(
-                "updated_by_employee_name")
+                "updated_by_employee_name"),
+        )
+
+        roles_column = (
+            func.json_agg(
+                func.json_build_object(
+                    "id", Roles.id,
+                    "name", Roles.name
+                )
+            )
+            .filter(Roles.id.is_not(None))
+            .label("roles"),
         )
 
         query = (
             select(
                 *employee_columns,
                 *organization_columns,
-                *selected_columns
+                *selected_columns,
+                *roles_column,
             )
             .join(
                 Organization,
@@ -100,6 +114,22 @@ class EmployeeRepository:
             .outerjoin(
                 updated_employee,
                 Employee.updated_by_emp == updated_employee.id
+            )
+            .outerjoin(
+                EmployeeRoles,
+                Employee.id == EmployeeRoles.emp_id
+            )
+            .outerjoin(
+                Roles,
+                EmployeeRoles.role_id == Roles.id
+            )
+            .group_by(
+                Employee.id,
+                Organization.id,
+                created_admin.id,
+                updated_admin.id,
+                created_employee.id,
+                updated_employee.id,
             )
         )
 

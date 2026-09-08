@@ -3,7 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr
 
-from app.core.enums import DepartmentType
+from app.core.enums import DepartmentType, UserRole
 
 
 class EmployeeCreate(BaseModel):
@@ -18,6 +18,7 @@ class EmployeeCreate(BaseModel):
     address: str | None = Field(default=None, min_length=5, max_length=200, description="Employee Address")
     department: DepartmentType = Field("Employee Department")
     organization_id: int = Field(gt=0, description="Organization Id to which employee belongs to")
+    role_slug: UserRole = Field("Employee Role slug")
 
 
 class EmployeeCreateResponse(BaseModel):
@@ -36,7 +37,13 @@ class EmployeeCreateResponse(BaseModel):
     updated_at: datetime | None = None
 
 
+class EmployeeRoleResponse(BaseModel):
+    id: int | None = None
+    name: str | None = None
+
+
 class EmployeeDetailResponse(EmployeeCreateResponse):
+    roles: list[EmployeeRoleResponse] | None = None
     organization_name: str | None = None
     created_by_admin_name: str | None = None
     updated_by_admin_name: str | None = None

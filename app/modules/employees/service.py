@@ -7,6 +7,10 @@ from app.core.enums import AdminRole, UserRole
 from app.core.exceptions import AccessDeniedError
 from app.core.logging import get_logger
 from app.core.security import hash_password
+from app.modules.EmployeeRoles.models import EmployeeRoles
+from app.modules.EmployeeRoles.repository import EmployeeRolesRepository
+from app.modules.Roles.execptions import RolesNotFoundError, RolesNotActiveError
+from app.modules.Roles.repository import RolesRepository
 from app.modules.employees.exceptions import (
     EmailAlreadyExistsError,
     EmployeeNotFoundError,
@@ -24,20 +28,24 @@ class EmployeeService:
 
     def __init__(self, db: AsyncSession, current_user: CurrentUser):
         self.db = db
-        self.repo = EmployeeRepository(db)
+        self.emp_repo = EmployeeRepository(db)
+        self.role_repo = RolesRepository(db)
+        self.emp_roles_repo = EmployeeRolesRepository(db)
         self.user = current_user
 
     async def create_employee(self, data: EmployeeCreate) -> EmployeeDetailResponse:
         async with self.db.begin():
-            existing = await self.repo.get_by(None, data.email)
+            existing = await self.emp_repo.get_by(None, data.email)
 
             if existing:
                 raise EmailAlreadyExistsError(existing.email)
 
             hashed_password = hash_password(data.password.get_secret_value())
 
+            role_slug = data.role_slug
+
             emp_dict = {
-                **data.model_dump(exclude_none=True, exclude={"password"}),
+                **data.model_dump(exclude_none=True, exclude={"password", "role_slug"}),
                 "password_hash": hashed_password,
                 "is_active": True
             }
@@ -50,14 +58,31 @@ class EmployeeService:
                 raise ValueError("Employee can be created only be admin or manager")
 
             emp = Employee(**emp_dict)
-            new_emp = await self.repo.create(emp)
-            existing = await self.repo.get_by_detailed(new_emp.id, None)
+            new_emp = await self.emp_repo.create(emp)
+
+            # Adding role
+            existing_role = await self.role_repo.get_by_slug(role_slug)
+            if not existing_role:
+                raise RolesNotFoundError()
+
+            if not existing_role.is_active:
+                raise RolesNotActiveError()
+
+            emp_roles_dict = {
+                "emp_id": new_emp.id,
+                "role_id": existing_role.id
+            }
+
+            emp_roles = EmployeeRoles(**emp_roles_dict)
+            await self.emp_roles_repo.create(emp_roles)
+
+            existing = await self.emp_repo.get_by_detailed(new_emp.id, None)
             logger.info("Employee created successfully: %s", existing)
             return existing
 
     async def update_employee(self, emp_id: int, data: EmployeeUpdate) -> EmployeeDetailResponse:
         async with self.db.begin():
-            existing = await self.repo.get_by(emp_id, None)
+            existing = await self.emp_repo.get_by(emp_id, None)
 
             logger.debug("existing_employee : %s", existing)
 
@@ -94,18 +119,18 @@ class EmployeeService:
                 emp_dict.pop("password", None);
                 emp_dict["password_hash"] = hash_password(password_hash)
 
-            await self.repo.update(existing, emp_dict)
-            updated_employee = await self.repo.get_by_detailed(existing.id, None)
+            await self.emp_repo.update(existing, emp_dict)
+            updated_employee = await self.emp_repo.get_by_detailed(existing.id, None)
             return updated_employee
 
     async def delete_employee(self, emp_id: int) -> None:
         async with self.db.begin():
-            existing = await self.repo.get_by(emp_id, None)
+            existing = await self.emp_repo.get_by(emp_id, None)
 
             if not existing:
                 raise EmployeeNotFoundError()
 
-            await self.repo.delete(existing)
+            await self.emp_repo.delete(existing)
             return None
 
     async def get_list(self, params: EmployeeGetList) -> EmployeeListResponse:
@@ -114,7 +139,7 @@ class EmployeeService:
                     params.sort_by is not None and params.sort_order is None):
                 raise EmployeeValidationError("Provide sort_order and sort_by or None")
 
-            employees, total = await self.repo.get_list(params.model_dump())
+            employees, total = await self.emp_repo.get_list(params.model_dump())
             page = params.page or 1
             page_size = params.page_size or 20
             pages = math.ceil(total / page_size) if page_size > 0 else 0
