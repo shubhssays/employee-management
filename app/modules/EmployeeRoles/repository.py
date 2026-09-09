@@ -1,7 +1,8 @@
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.EmployeeRoles.models import EmployeeRoles
+from app.modules.Roles.models import Roles
 
 
 class EmployeeRolesRepository:
@@ -21,3 +22,29 @@ class EmployeeRolesRepository:
         self.db.add(emp_roles)
         await self.db.flush()
         return None
+
+    async def delete(self, ids=list[int]) -> None:
+        stmt = delete(EmployeeRoles).where(
+            EmployeeRoles.id.in_(ids)
+        )
+
+        await self.db.execute(stmt)
+        return None
+
+    async def get_emp_roles(self, emp_id: int) -> list[str]:
+        stmt = (
+            select(
+                Roles.slug,
+            )
+            .select_from(EmployeeRoles)
+            .join(
+                Roles,
+                EmployeeRoles.role_id == Roles.id
+            )
+            .where(
+                EmployeeRoles.emp_id == emp_id
+            )
+        )
+
+        result = await self.db.execute(stmt)
+        return result.scalars().all()

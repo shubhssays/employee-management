@@ -48,11 +48,13 @@ def upgrade() -> None:
 
     # Add Index
     op.create_index("idx_organizations_slug", "organizations", ["slug"])
+    op.create_unique_constraint("uq_organizations_slug", "organizations", ["slug"])
 
 
 def downgrade() -> None:
     # Drop Index
     op.drop_index("idx_organizations_slug", table_name="organizations")
+    op.drop_constraint("uq_organizations_slug", table_name="organizations", type_="unique")
 
     # Drop Organization Table
     op.drop_table("organizations")

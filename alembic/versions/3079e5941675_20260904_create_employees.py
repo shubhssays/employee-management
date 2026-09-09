@@ -76,10 +76,16 @@ def upgrade() -> None:
     op.create_index("idx_employees_email", "employees", columns=["email"])
     op.create_index("idx_employees_mobile", "employees", columns=["mobile"])
 
+    # Add unique key constraint
+    op.create_unique_constraint("uq_employees_email", "employees", columns=["email"])
+    op.create_unique_constraint("uq_employees_mobile", "employees", columns=["mobile"])
+
 
 def downgrade() -> None:
-    op.drop_constraint("check_created_by_emp_or_created_by_admin_negative", "employees")
-    op.drop_constraint("check_created_by_emp_or_created_by_admin_positive", "employees")
+    op.drop_constraint("check_created_by_emp_or_created_by_admin_negative", "employees", type_="check")
+    op.drop_constraint("check_created_by_emp_or_created_by_admin_positive", "employees", type_="check")
+    op.drop_constraint("uq_employees_email", "employees", type_="unique")
+    op.drop_constraint("uq_employees_mobile", "employees", type_="unique")
     op.drop_index("idx_employees_mobile", table_name="employees")
     op.drop_index("idx_employees_email", table_name="employees")
     op.drop_table("employees")

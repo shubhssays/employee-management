@@ -35,6 +35,9 @@ def upgrade() -> None:
     op.create_index("idx_roles_slug", "roles", ["slug"])
     op.create_index("idx_roles_name", "roles", ["name"])
 
+    op.create_unique_constraint("uq_roles_slug", "roles", ["slug"])
+    op.create_unique_constraint("uq_roles_name", "roles", ["name"])
+
     # Insert into Roles Table
     op.bulk_insert(
         sa.table(
@@ -73,6 +76,7 @@ def upgrade() -> None:
     )
 
     op.create_index("idx_admins_email", "admins", ["email"])
+    op.create_unique_constraint("uq_admins_email", "admins", ["email"])
 
     # Insert into Admins Table
     op.bulk_insert(
@@ -97,7 +101,12 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_index("idx_roles_slug", table_name="roles")
     op.drop_index("idx_roles_name", table_name="roles")
+
+    op.drop_constraint("uq_roles_slug", table_name="roles", type_="unique")
+    op.drop_constraint("uq_roles_name", table_name="roles", type_="unique")
+
     op.drop_table("roles")
 
     op.drop_index("idx_admins_email", table_name="admins")
+    op.drop_constraint("uq_admins_email", table_name="admins", type_="unique")
     op.drop_table("admins")

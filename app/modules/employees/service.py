@@ -9,7 +9,7 @@ from app.core.logging import get_logger
 from app.core.security import hash_password
 from app.modules.EmployeeRoles.models import EmployeeRoles
 from app.modules.EmployeeRoles.repository import EmployeeRolesRepository
-from app.modules.Roles.execptions import RolesNotFoundError, RolesNotActiveError
+from app.modules.Roles.exceptions import RolesNotFoundError, RolesNotActiveError
 from app.modules.Roles.repository import RolesRepository
 from app.modules.employees.exceptions import (
     EmailAlreadyExistsError,
@@ -61,9 +61,11 @@ class EmployeeService:
             new_emp = await self.emp_repo.create(emp)
 
             # Adding role
-            existing_role = await self.role_repo.get_by_slug(role_slug)
-            if not existing_role:
+            existing_roles = await self.role_repo.get_by_slug([role_slug])
+            if not existing_roles:
                 raise RolesNotFoundError()
+
+            existing_role = existing_roles[0]
 
             if not existing_role.is_active:
                 raise RolesNotActiveError()
@@ -84,16 +86,17 @@ class EmployeeService:
         async with self.db.begin():
             existing = await self.emp_repo.get_by(emp_id, None)
 
-            logger.debug("existing_employee : %s", existing)
-
             if not existing:
                 raise EmployeeNotFoundError()
 
             if self.user.role == UserRole.EMPLOYEE and existing.id != self.user.user_id:
                 raise AccessDeniedError()
 
+            role_slug = data.role_slug
+            remove_roles_slug = data.remove_roles_slug
+
             emp_dict = {
-                **data.model_dump(exclude_none=True, exclude_unset=True)
+                **data.model_dump(exclude_none=True, exclude_unset=True, exclude={"role_slug", "remove_roles_slug"})
             }
 
             if not emp_dict:
@@ -120,6 +123,59 @@ class EmployeeService:
                 emp_dict["password_hash"] = hash_password(password_hash)
 
             await self.emp_repo.update(existing, emp_dict)
+
+            # Validating roles
+            if remove_roles_slug and role_slug:
+                if role_slug in remove_roles_slug:
+                    raise EmployeeValidationError(
+                        f"Same '{role_slug}' role cannot be added and removed at the same time")
+
+            # Finding existing roles
+            existing_emp_roles = await self.emp_roles_repo.get_emp_roles(existing.id)
+
+            ## Removing slug
+            # Checking roles that needs to be removed is actually assigned to employee or not
+            if remove_roles_slug:
+                for role in remove_roles_slug:
+                    if role not in existing_emp_roles:
+                        raise EmployeeValidationError(f"'{role}' is not assigned to user. Thus, it cannot be removed")
+
+                # Checking if role that needs to be removed is actually assigned to employee or not
+                existing_assigned_roles = await self.role_repo.get_by_slug(remove_roles_slug)
+                existing_assigned_role_ids = []
+                for existing_assigned_role in existing_assigned_roles:
+                    existing_assigned_emp_role = await self.emp_roles_repo.get_by(existing.id,
+                                                                                  existing_assigned_role.id)
+                    # Collected employee_role_id
+                    existing_assigned_role_ids.append(existing_assigned_emp_role.id)
+                # Deleting entering from employee_roles table
+                await self.emp_roles_repo.delete(existing_assigned_role_ids)
+
+            ## Adding role
+
+            # Checking if role that needs to be added is actually assigned to employee or not
+            if role_slug:
+                if role_slug in existing_emp_roles:
+                    logger.warning(f"'{role_slug}' is already assigned to user. Thus, it cannot be assigned again")
+                else:
+                    existing_roles = await self.role_repo.get_by_slug([role_slug])
+                    if not existing_roles:
+                        raise RolesNotFoundError()
+
+                    existing_role = existing_roles[0]
+
+                    if not existing_role.is_active:
+                        raise RolesNotActiveError()
+
+                    emp_roles_dict = {
+                        "emp_id": existing.id,
+                        "role_id": existing_role.id
+                    }
+
+                    emp_roles = EmployeeRoles(**emp_roles_dict)
+
+                    await self.emp_roles_repo.create(emp_roles)
+
             updated_employee = await self.emp_repo.get_by_detailed(existing.id, None)
             return updated_employee
 

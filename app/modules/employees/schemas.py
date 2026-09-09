@@ -62,6 +62,8 @@ class EmployeeUpdate(BaseModel):
     password: SecretStr | None = Field(default=None, description="Employee password")
     address: str | None = Field(default=None, min_length=5, max_length=200, description="Employee Address")
     is_active: bool | None = Field(default=None, description="Flags employee active or inactive")
+    role_slug: UserRole | None = Field(default=None, description="Employee Role slug")
+    remove_roles_slug: list[UserRole] | None = Field(default=None, description="Remove Employee Role slug")
 
 
 class EmployeeGetList(BaseModel):

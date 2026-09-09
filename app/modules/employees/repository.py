@@ -95,6 +95,7 @@ class EmployeeRepository:
                 *selected_columns,
                 *roles_column,
             )
+            .select_from(Employee) 
             .join(
                 Organization,
                 Employee.organization_id == Organization.id

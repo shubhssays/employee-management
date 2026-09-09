@@ -31,8 +31,10 @@ def upgrade() -> None:
     )
 
     op.create_index("idx_employee_roles_emp_id_role_id", "employee_roles", ["emp_id", "role_id"])
+    op.create_unique_constraint("uq_employee_roles_emp_id_role_id", "employee_roles", ["emp_id", "role_id"])
 
 
 def downgrade() -> None:
     op.drop_index("idx_employee_roles_emp_id_role_id", "employee_roles")
+    op.drop_constraint("uq_employee_roles_emp_id_role_id", "employee_roles", type_="unique")
     op.drop_table("employee_roles")
