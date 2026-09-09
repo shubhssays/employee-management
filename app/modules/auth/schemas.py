@@ -1,4 +1,6 @@
-from pydantic import BaseModel, ConfigDict, EmailStr, SecretStr
+from pydantic import BaseModel, ConfigDict, EmailStr, SecretStr, Field
+
+from app.core.enums import UserRole
 
 
 class Login(BaseModel):
@@ -31,3 +33,10 @@ class LoginResponse(BaseModel):
     last_name: str | None
     roles: list[str]
     access_token: str
+
+
+class SwitchRole(BaseModel):
+    """Prevents extra data in body"""
+    model_config = ConfigDict(extra="forbid")
+
+    role: UserRole = Field(description="Employee Role slug")

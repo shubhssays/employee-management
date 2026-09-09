@@ -3,12 +3,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
-from app.modules.EmployeeRoles.models import EmployeeRoles
-from app.modules.Roles.models import Roles
 from app.modules.auth.models import Admin
+from app.modules.employee_roles.models import EmployeeRoles
 from app.modules.employees.models import Employee
 from app.modules.employees.schemas import EmployeeDetailResponse
 from app.modules.organization.models import Organization
+from app.modules.roles.models import Roles
 
 
 class EmployeeRepository:
@@ -81,7 +81,8 @@ class EmployeeRepository:
             func.json_agg(
                 func.json_build_object(
                     "id", Roles.id,
-                    "name", Roles.name
+                    "name", Roles.name,
+                    "slug", Roles.slug
                 )
             )
             .filter(Roles.id.is_not(None))
@@ -95,7 +96,7 @@ class EmployeeRepository:
                 *selected_columns,
                 *roles_column,
             )
-            .select_from(Employee) 
+            .select_from(Employee)
             .join(
                 Organization,
                 Employee.organization_id == Organization.id

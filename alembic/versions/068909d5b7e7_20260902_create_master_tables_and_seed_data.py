@@ -20,7 +20,7 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    # Create Roles Table
+    # Create roles Table
     op.create_table(
         "roles",
         sa.Column("id", sa.Integer, primary_key=True),
@@ -38,7 +38,7 @@ def upgrade() -> None:
     op.create_unique_constraint("uq_roles_slug", "roles", ["slug"])
     op.create_unique_constraint("uq_roles_name", "roles", ["name"])
 
-    # Insert into Roles Table
+    # Insert into roles Table
     op.bulk_insert(
         sa.table(
             "roles",

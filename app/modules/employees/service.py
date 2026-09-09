@@ -7,10 +7,8 @@ from app.core.enums import AdminRole, UserRole
 from app.core.exceptions import AccessDeniedError
 from app.core.logging import get_logger
 from app.core.security import hash_password
-from app.modules.EmployeeRoles.models import EmployeeRoles
-from app.modules.EmployeeRoles.repository import EmployeeRolesRepository
-from app.modules.Roles.exceptions import RolesNotFoundError, RolesNotActiveError
-from app.modules.Roles.repository import RolesRepository
+from app.modules.employee_roles.models import EmployeeRoles
+from app.modules.employee_roles.repository import EmployeeRolesRepository
 from app.modules.employees.exceptions import (
     EmailAlreadyExistsError,
     EmployeeNotFoundError,
@@ -20,6 +18,8 @@ from app.modules.employees.models import Employee
 from app.modules.employees.repository import EmployeeRepository
 from app.modules.employees.schemas import EmployeeCreate, EmployeeDetailResponse, EmployeeUpdate, EmployeeGetList, \
     EmployeeListResponse
+from app.modules.roles.exceptions import RolesNotFoundError, RolesNotActiveError
+from app.modules.roles.repository import RolesRepository
 
 logger = get_logger("__name__")
 

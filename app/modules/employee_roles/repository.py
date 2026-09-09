@@ -1,8 +1,8 @@
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.EmployeeRoles.models import EmployeeRoles
-from app.modules.Roles.models import Roles
+from app.modules.employee_roles.models import EmployeeRoles
+from app.modules.roles.models import Roles
 
 
 class EmployeeRolesRepository:

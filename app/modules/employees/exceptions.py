@@ -35,6 +35,15 @@ class EmployeeValidationError(BadRequestError):
         super().__init__(f"{msg}")
 
 
+
+class EmployeeRoleValidationError(BadRequestError):
+    error_code = "EMPLOYEE_ROLE_NOT_FOUND"
+
+    def __init__(self) -> None:
+        super().__init__("No role has been assigned")
+
+
+
 class CannotDeactivateSoleAdminError(UnprocessableError):
     error_code = "CANNOT_DEACTIVATE_SOLE_ADMIN"
 

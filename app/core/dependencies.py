@@ -91,20 +91,20 @@ async def get_current_user(
     except (TokenExpiredError, TokenInvalidError) as exc:
         raise exc
 
-    user_role = None
+    active_role = None
 
     try:
-        user_role = AdminRole(payload["active_role"])
+        active_role = AdminRole(payload["active_role"])
     except ValueError:
         try:
-            user_role = UserRole(payload["active_role"])
+            active_role = UserRole(payload["active_role"])
         except (KeyError, ValueError) as exc:
             raise AuthenticationError("Token payload is malformed.") from exc
 
     return CurrentUser(
         user_id=int(payload["sub"]),
         organization_id=int(payload.get("org", 0)),
-        active_role=user_role,
+        active_role=active_role,
     )
 
 
@@ -118,6 +118,15 @@ async def require_admin(
 ) -> CurrentUser:
     """Allow only ADMIN active_role. Returns CurrentUser for further use."""
     if current_user.active_role != AdminRole.ADMIN:
+        raise ForbiddenError(f"Role '{current_user.active_role}' does not have access to this resource.")
+    return current_user
+
+
+async def require_manager(
+        current_user: Annotated[CurrentUser, Depends(get_current_user)],
+) -> CurrentUser:
+    """Allow only ADMIN active_role. Returns CurrentUser for further use."""
+    if current_user.active_role != UserRole.MANAGER:
         raise ForbiddenError(f"Role '{current_user.active_role}' does not have access to this resource.")
     return current_user
 
@@ -137,5 +146,6 @@ async def require_manager_or_admin(
 
 CurrentUserDep = Annotated[CurrentUser, Depends(get_current_user)]
 AdminDep = Annotated[CurrentUser, Depends(require_admin)]
+ManagerDep = Annotated[CurrentUser, Depends(require_manager)]
 ManagerOrAdminDep = Annotated[CurrentUser, Depends(require_manager_or_admin)]
 DbSession = Annotated[AsyncSession, Depends(get_db)]
