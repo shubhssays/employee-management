@@ -23,9 +23,9 @@ class EmployeeRolesRepository:
         await self.db.flush()
         return None
 
-    async def delete(self, ids=list[int]) -> None:
+    async def delete_by_emp_id(self, emp_id: int) -> None:
         stmt = delete(EmployeeRoles).where(
-            EmployeeRoles.id.in_(ids)
+            EmployeeRoles.emp_id == emp_id
         )
 
         await self.db.execute(stmt)

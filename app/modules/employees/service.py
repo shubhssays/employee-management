@@ -186,6 +186,9 @@ class EmployeeService:
             if not existing:
                 raise EmployeeNotFoundError()
 
+            # Deleting employee roles first
+            await self.emp_roles_repo.delete_by_emp_id(existing.id)
+            # Deleting employee now
             await self.emp_repo.delete(existing)
             return None
 
