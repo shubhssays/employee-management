@@ -35,7 +35,7 @@ class AuthService:
             result = {
                 "sub": str(existing.id),
                 "org": 0,  # Ideally, Admin is not linked to any org, but it is just for the sake of consistency
-                "role": AdminRole.ADMIN.value
+                "active_role": AdminRole.ADMIN.value
             }
 
             token = create_access_token(result)
@@ -44,5 +44,6 @@ class AuthService:
                 id=existing.id,
                 email=existing.email,
                 name=existing.name,
-                access_token=token
+                access_token=token,
+                roles=[AdminRole.ADMIN.value]
             )

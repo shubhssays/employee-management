@@ -33,7 +33,7 @@ class EmployeeService:
         self.emp_roles_repo = EmployeeRolesRepository(db)
         self.user = current_user
 
-    async def create_employee(self, data: EmployeeCreate) -> EmployeeDetailResponse:
+    async def create_employee(self, data: EmployeeCreate) -> EmployeeDetailResponse | None:
         async with self.db.begin():
             existing = await self.emp_repo.get_by(None, data.email)
 
@@ -50,9 +50,9 @@ class EmployeeService:
                 "is_active": True
             }
 
-            if self.user.role == AdminRole.ADMIN:
+            if self.user.active_role == AdminRole.ADMIN:
                 emp_dict["created_by_admin"] = self.user.user_id
-            elif self.user.role == UserRole.MANAGER:
+            elif self.user.active_role == UserRole.MANAGER:
                 emp_dict["created_by_emp"] = self.user.user_id
             else:
                 raise ValueError("Employee can be created only be admin or manager")
@@ -82,14 +82,14 @@ class EmployeeService:
             logger.info("Employee created successfully: %s", existing)
             return existing
 
-    async def update_employee(self, emp_id: int, data: EmployeeUpdate) -> EmployeeDetailResponse:
+    async def update_employee(self, emp_id: int, data: EmployeeUpdate) -> EmployeeDetailResponse | None:
         async with self.db.begin():
             existing = await self.emp_repo.get_by(emp_id, None)
 
             if not existing:
                 raise EmployeeNotFoundError()
 
-            if self.user.role == UserRole.EMPLOYEE and existing.id != self.user.user_id:
+            if self.user.active_role == UserRole.EMPLOYEE and existing.id != self.user.user_id:
                 raise AccessDeniedError()
 
             role_slug = data.role_slug
@@ -102,19 +102,19 @@ class EmployeeService:
             if not emp_dict:
                 raise EmployeeValidationError("No data to update")
 
-            if "is_active" in emp_dict and self.user.role not in [UserRole.MANAGER, AdminRole.ADMIN]:
+            if "is_active" in emp_dict and self.user.active_role not in [UserRole.MANAGER, AdminRole.ADMIN]:
                 raise EmployeeValidationError("Only manager and admin can mark employee as active or inactive")
 
-            if "mobile" in emp_dict and self.user.role not in [UserRole.MANAGER, AdminRole.ADMIN]:
+            if "mobile" in emp_dict and self.user.active_role not in [UserRole.MANAGER, AdminRole.ADMIN]:
                 raise EmployeeValidationError("Only manager and admin can update mobile")
 
-            if "email" in emp_dict and self.user.role not in [UserRole.MANAGER, AdminRole.ADMIN]:
+            if "email" in emp_dict and self.user.active_role not in [UserRole.MANAGER, AdminRole.ADMIN]:
                 raise EmployeeValidationError("Only manager and admin can update email")
 
-            if self.user.role in [UserRole.MANAGER, UserRole.EMPLOYEE]:
+            if self.user.active_role in [UserRole.MANAGER, UserRole.EMPLOYEE]:
                 emp_dict["updated_by_emp"] = self.user.user_id
 
-            if self.user.role == AdminRole.ADMIN:
+            if self.user.active_role == AdminRole.ADMIN:
                 emp_dict["updated_by_admin"] = self.user.user_id
 
             if "password" in emp_dict:

@@ -8,11 +8,11 @@ Dependency injection chain:
     HTTP Request
         → get_db (database session)
         → get_current_user (extract + validate JWT, return CurrentUser)
-        → require_admin / require_manager (role gate)
+        → require_admin / require_manager  active_role gate)
 
 CurrentUser is a lightweight data object — not an ORM model.
 It carries exactly the fields needed for authorization decisions:
-  user_id, organization_id, employee_id, role.
+  user_id, organization_id, employee_id, active_role.
 
 This keeps routers and services decoupled from SQLAlchemy model internals.
 """
@@ -34,6 +34,7 @@ from app.core.exceptions import (
 from app.core.security import decode_access_token
 from app.db.session import get_db  # noqa: F401 — re-exported for convenience
 
+
 # ---------------------------------------------------------------------------
 # Re-export get_db so callers can import from here or from db.session
 # ---------------------------------------------------------------------------
@@ -53,12 +54,12 @@ class CurrentUser(BaseModel):
     Attributes:
         user_id:          int of the User record (auth identity)
         organization_id:  int of the tenant the user belongs to
-        role:             Role enum (ADMIN | MANAGER | EMPLOYEE)
+     active_role:             Role enum (ADMIN | MANAGER | EMPLOYEE)
     """
 
     user_id: int
     organization_id: int
-    role: UserRole | AdminRole
+    active_role: UserRole | AdminRole
 
 
 # ---------------------------------------------------------------------------
@@ -93,17 +94,17 @@ async def get_current_user(
     user_role = None
 
     try:
-        user_role = AdminRole(payload["role"])
+        user_role = AdminRole(payload["active_role"])
     except ValueError:
         try:
-            user_role = UserRole(payload["role"])
+            user_role = UserRole(payload["active_role"])
         except (KeyError, ValueError) as exc:
             raise AuthenticationError("Token payload is malformed.") from exc
 
     return CurrentUser(
         user_id=int(payload["sub"]),
         organization_id=int(payload.get("org", 0)),
-        role=user_role,
+        active_role=user_role,
     )
 
 
@@ -115,18 +116,18 @@ async def get_current_user(
 async def require_admin(
         current_user: Annotated[CurrentUser, Depends(get_current_user)],
 ) -> CurrentUser:
-    """Allow only ADMIN role. Returns CurrentUser for further use."""
-    if current_user.role != AdminRole.ADMIN:
-        raise ForbiddenError(f"Role '{current_user.role}' does not have access to this resource.")
+    """Allow only ADMIN active_role. Returns CurrentUser for further use."""
+    if current_user.active_role != AdminRole.ADMIN:
+        raise ForbiddenError(f"Role '{current_user.active_role}' does not have access to this resource.")
     return current_user
 
 
 async def require_manager_or_admin(
         current_user: Annotated[CurrentUser, Depends(get_current_user)],
 ) -> CurrentUser:
-    """Allow MANAGER or ADMIN role. Returns CurrentUser for further use."""
-    if current_user.role not in [UserRole.MANAGER, AdminRole.ADMIN]:
-        raise ForbiddenError(f"Role '{current_user.role}' does not have access to this resource.")
+    """Allow MANAGER or ADMIN active_role. Returns CurrentUser for further use."""
+    if current_user.active_role not in [UserRole.MANAGER, AdminRole.ADMIN]:
+        raise ForbiddenError(f"Role '{current_user.active_role}' does not have access to this resource.")
     return current_user
 
 

@@ -17,3 +17,4 @@ class AdminLoginResponse(BaseModel):
     email: str
     name: str
     access_token: str
+    roles: list[str]
