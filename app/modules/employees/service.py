@@ -140,16 +140,14 @@ class EmployeeService:
                     if role not in existing_emp_roles:
                         raise EmployeeValidationError(f"'{role}' is not assigned to user. Thus, it cannot be removed")
 
-                # Checking if role that needs to be removed is actually assigned to employee or not
-                existing_assigned_roles = await self.role_repo.get_by_slug(remove_roles_slug)
-                existing_assigned_role_ids = []
-                for existing_assigned_role in existing_assigned_roles:
-                    existing_assigned_emp_role = await self.emp_roles_repo.get_by(existing.id,
-                                                                                  existing_assigned_role.id)
-                    # Collected employee_role_id
-                    existing_assigned_role_ids.append(existing_assigned_emp_role.id)
-                # Deleting entering from employee_roles table
-                await self.emp_roles_repo.delete(existing_assigned_role_ids)
+                # Finding role_id of roles to remove
+                assigned_roles_to_removed = await self.role_repo.get_by_slug(remove_roles_slug)
+                if assigned_roles_to_removed:
+                    assigned_role_ids_to_removed = [assigned_role_to_removed.id for assigned_role_to_removed in
+                                                    assigned_roles_to_removed]
+
+                    # Deleting entering from employee_roles table
+                    await self.emp_roles_repo.delete_by(existing.id, assigned_role_ids_to_removed)
 
             ## Adding role
 
@@ -187,7 +185,7 @@ class EmployeeService:
                 raise EmployeeNotFoundError()
 
             # Deleting employee roles first
-            await self.emp_roles_repo.delete_by_emp_id(existing.id)
+            await self.emp_roles_repo.delete_by(existing.id, None)
             # Deleting employee now
             await self.emp_repo.delete(existing)
             return None

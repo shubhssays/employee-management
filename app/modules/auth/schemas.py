@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, EmailStr, SecretStr
 
 
-class AdminLogin(BaseModel):
+class Login(BaseModel):
     """Prevents extra data in body"""
     model_config = ConfigDict(extra="forbid")
 
@@ -16,5 +16,18 @@ class AdminLoginResponse(BaseModel):
     id: int
     email: str
     name: str
-    access_token: str
     roles: list[str]
+    access_token: str
+
+
+class LoginResponse(BaseModel):
+    # Without this, we would have to manually map every field.
+    model_config = {"from_attributes": True}
+
+    id: int
+    email: str
+    mobile: str | None
+    first_name: str
+    last_name: str | None
+    roles: list[str]
+    access_token: str

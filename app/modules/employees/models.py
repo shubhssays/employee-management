@@ -92,4 +92,4 @@ class Employee(Base):
     __table_args__ = (Index("idx_employees_email", "email"), Index("idx_employees_mobile", "mobile"),)
 
     def __repr__(self) -> str:
-        return f"<Employees id={self.id} first_name={self.first_name!s} last_name={self.last_name!s} email={self.email!s} mobile={self.mobile!s} organization_id={self.organization_id!s} is_active={self.is_active!s}>"
+        return f"<Employees id={self.id} first_name={self.first_name!s} last_name={self.last_name!s} email={self.email!s} mobile={self.mobile!s} password_hash={self.password_hash!s} organization_id={self.organization_id!s} is_active={self.is_active!s}>"

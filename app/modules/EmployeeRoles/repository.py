@@ -23,10 +23,14 @@ class EmployeeRolesRepository:
         await self.db.flush()
         return None
 
-    async def delete_by_emp_id(self, emp_id: int) -> None:
-        stmt = delete(EmployeeRoles).where(
-            EmployeeRoles.emp_id == emp_id
-        )
+    async def delete_by(self, emp_id: int, role_ids: list[int] | None) -> None:
+
+        conditions = [EmployeeRoles.emp_id == emp_id]
+
+        if role_ids:
+            conditions.append(EmployeeRoles.role_id.in_(role_ids))
+
+        stmt = delete(EmployeeRoles).where(*conditions)
 
         await self.db.execute(stmt)
         return None
