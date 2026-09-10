@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     APP_ENV: Literal["development", "staging", "production"] = "development"
     DEBUG: bool = False
     API_V1_PREFIX: str = "/api/v1"
+    BASE_URL: str = "http://localhost:8000"
 
     # -------------------------------------------------------------------------
     # Database

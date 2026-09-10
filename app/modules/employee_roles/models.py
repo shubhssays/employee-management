@@ -25,7 +25,7 @@ class EmployeeRoles(Base):
         Boolean,
         nullable=False,
         default=True,
-        comment="Flags user as active or inactive"
+        comment="Flags row as active or inactive"
     )
 
     __table_args__ = (Index("idx_employee_roles_emp_id_role_id", "emp_id", "role_id"),)
