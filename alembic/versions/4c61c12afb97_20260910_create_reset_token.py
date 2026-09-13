@@ -23,7 +23,7 @@ def upgrade() -> None:
         CREATE TABLE reset_token (
             id INT GENERATED ALWAYS AS IDENTITY,
             emp_id INT REFERENCES employees(id) NOT NULL,
-            token UUID NOT NULL,
+            token VARCHAR(100) NOT NULL,
             is_active BOOLEAN NOT NULL DEFAULT TRUE,
             used_at TIMESTAMPTZ DEFAULT NULL,
             expiry_at TIMESTAMPTZ NOT NULL,

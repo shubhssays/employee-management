@@ -1,6 +1,7 @@
 from datetime import datetime
+from typing import Optional
 
-from sqlalchemy import Integer, ForeignKey, Uuid, Boolean, DateTime
+from sqlalchemy import Integer, ForeignKey, Boolean, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base_model import Base
@@ -17,19 +18,19 @@ class ResetToken(Base):
     )
 
     token: Mapped[str] = mapped_column(
-        Uuid,
+        String,
         nullable=False,
         comment="Unique code for password reset request"
     )
 
-    is_active: Mapped[str] = mapped_column(
+    is_active: Mapped[bool] = mapped_column(
         Boolean,
         nullable=False,
         default=True,
         comment="Flags row as active or inactive"
     )
 
-    used_at: Mapped[datetime] = mapped_column(
+    used_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True),
         nullable=True,
     )
