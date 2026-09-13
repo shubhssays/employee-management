@@ -7,13 +7,14 @@ from app.core.dependencies import DbSession, AdminDep
 from app.modules.organization.schemas import OrganizationResponse, OrganizationCreate, OrganizationUpdate, \
     OrganizationGetList, OrganizationListResponse
 from app.modules.organization.service import OrganizationService
+from app.shared.schemas import SuccessResponse
 
 router = APIRouter(tags=["Organization"])
 
 
 @router.post(
     "/",
-    response_model=OrganizationResponse,
+    response_model=SuccessResponse[OrganizationResponse],
     status_code=status.HTTP_201_CREATED,
     summary="Create Organization",
     description=(
@@ -25,15 +26,19 @@ async def create_organization(
         current_user: AdminDep,
         body: OrganizationCreate,
         db: DbSession,
-) -> OrganizationResponse:
+) -> SuccessResponse[OrganizationResponse]:
     service = OrganizationService(db, current_user)
     organization = await service.create_organization(data=body)
-    return OrganizationResponse.model_validate(organization)
+    response = OrganizationResponse.model_validate(organization)
+    return SuccessResponse(
+        data=response,
+        message="Organization created successfully"
+    )
 
 
 @router.patch(
     "/{organization_id}",
-    response_model=OrganizationResponse,
+    response_model=SuccessResponse[OrganizationResponse],
     status_code=status.HTTP_200_OK,
     summary="Update Organization",
     description=(
@@ -45,15 +50,19 @@ async def update_organization(
         organization_id: Annotated[int, Field(gt=0)],
         body: OrganizationUpdate,
         db: DbSession,
-) -> OrganizationResponse:
+) -> SuccessResponse[OrganizationResponse]:
     service = OrganizationService(db, current_user)
     organization = await service.update_organization(organization_id, data=body)
-    return OrganizationResponse.model_validate(organization)
+    response = OrganizationResponse.model_validate(organization)
+    SuccessResponse(
+        data=response,
+        message="Organization updated successfully"
+    )
 
 
 @router.get(
     "/",
-    response_model=OrganizationListResponse,
+    response_model=SuccessResponse[OrganizationListResponse],
     status_code=status.HTTP_200_OK,
     summary="Get Organization list",
     description=(
@@ -70,15 +79,18 @@ async def get_organization(
         current_user: AdminDep,
         db: DbSession,
         params: OrganizationGetList = Query(),
-) -> OrganizationListResponse:
+) -> SuccessResponse[OrganizationListResponse]:
     service = OrganizationService(db, current_user)
-    return await service.get_organization(params)
+    response = await service.get_organization(params)
+    return SuccessResponse(
+        data=response,
+    )
 
 
 @router.delete(
     "/{organization_id}",
-    response_model=None,
-    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=SuccessResponse[None],
+    status_code=status.HTTP_200_OK,
     summary="Delete Organization",
     description=(
             "Delete a existing organization."
@@ -88,6 +100,9 @@ async def delete_organization(
         current_user: AdminDep,
         organization_id: Annotated[int, Field(gt=0)],
         db: DbSession,
-) -> None:
+) -> SuccessResponse[None]:
     service = OrganizationService(db, current_user)
-    return await service.delete_organization(organization_id)
+    await service.delete_organization(organization_id)
+    return SuccessResponse(
+        data=None
+    )

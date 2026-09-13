@@ -8,13 +8,14 @@ from app.core.dependencies import DbSession, ManagerOrAdminDep, CurrentUserDep
 from app.modules.employees.schemas import EmployeeCreate, EmployeeDetailResponse, EmployeeUpdate, EmployeeListResponse, \
     EmployeeGetList
 from app.modules.employees.service import EmployeeService
+from app.shared.schemas import SuccessResponse
 
 router = APIRouter(tags=["Employee"])
 
 
 @router.post(
     "/",
-    response_model=EmployeeDetailResponse,
+    response_model=SuccessResponse[EmployeeDetailResponse],
     status_code=status.HTTP_201_CREATED,
     summary="Create Employee",
     description=(
@@ -26,15 +27,19 @@ async def create_employee(
         current_user: ManagerOrAdminDep,
         body: EmployeeCreate,
         db: DbSession,
-) -> EmployeeDetailResponse:
+) -> SuccessResponse[EmployeeDetailResponse]:
     service = EmployeeService(db, current_user)
     employee = await service.create_employee(body)
-    return EmployeeDetailResponse.model_validate(employee)
+    response = EmployeeDetailResponse.model_validate(employee)
+    return SuccessResponse(
+        data=response,
+        message="Employee created successfully"
+    )
 
 
 @router.put(
     "/{emp_id}",
-    response_model=EmployeeDetailResponse,
+    response_model=SuccessResponse[EmployeeDetailResponse],
     status_code=status.HTTP_200_OK,
     summary="Update existing employee",
     description=(
@@ -49,16 +54,20 @@ async def update_employee(
         body: EmployeeUpdate,
         db: DbSession,
 
-) -> EmployeeDetailResponse:
+) -> SuccessResponse[EmployeeDetailResponse]:
     service = EmployeeService(db, current_user)
     employee = await service.update_employee(emp_id, body)
-    return EmployeeDetailResponse.model_validate(employee)
+    response = EmployeeDetailResponse.model_validate(employee)
+    return SuccessResponse(
+        data=response,
+        message="Employee updated successfully"
+    )
 
 
 @router.delete(
     "/{emp_id}",
-    response_model=None,
-    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=SuccessResponse[None],
+    status_code=status.HTTP_200_OK,
     summary="Delete existing employee",
     description=(
             "Only admin and manager can delete the employee"
@@ -68,15 +77,18 @@ async def delete_employee(
         current_user: ManagerOrAdminDep,
         emp_id: Annotated[int, Field(gt=0)],
         db: DbSession
-) -> None:
+) -> SuccessResponse[None]:
     service = EmployeeService(db, current_user)
     await service.delete_employee(emp_id)
-    return None
+    return SuccessResponse(
+        data=None,
+        message="Employee deleted successfully"
+    )
 
 
 @router.get(
     "/",
-    response_model=EmployeeListResponse,
+    response_model=SuccessResponse[EmployeeListResponse],
     status_code=status.HTTP_200_OK,
     summary="Get employee list",
     description=(
@@ -97,6 +109,9 @@ async def get_employees(
         current_user: ManagerOrAdminDep,
         db: DbSession,
         params: EmployeeGetList = Query()
-) -> EmployeeListResponse:
+) -> SuccessResponse[EmployeeListResponse]:
     service = EmployeeService(db, current_user)
-    return await service.get_list(params)
+    response = await service.get_list(params)
+    return SuccessResponse(
+        data=response,
+    )

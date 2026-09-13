@@ -8,7 +8,6 @@ All error responses from the API follow this structure:
             "code": "SNAKE_CASE_ERROR_CODE",
             "message": "Human-readable description.",
             "details": null | { ... } | [ { "field": ..., "message": ... } ],
-            "request_id": "req_abc123"
         }
     }
 
@@ -34,10 +33,10 @@ class ErrorBody(BaseModel):
     code: str
     message: str
     details: Any = None  # null | dict | list[ValidationErrorDetail]
-    request_id: str | None = None
 
 
 class ErrorResponse(BaseModel):
     """Top-level wrapper for every error response body."""
 
+    success: bool = False
     error: ErrorBody

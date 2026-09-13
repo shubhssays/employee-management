@@ -48,14 +48,13 @@ async def app_exception_handler(request: Request, exc: AppException) -> JSONResp
             code=exc.error_code,
             message=exc.message,
             details=exc.details,
-            request_id=_get_request_id(request),
         )
     )
     return JSONResponse(status_code=exc.status_code, content=body.model_dump())
 
 
 async def validation_exception_handler(
-    request: Request, exc: RequestValidationError
+        request: Request, exc: RequestValidationError
 ) -> JSONResponse:
     """
     Handle Pydantic validation errors (422).
@@ -73,7 +72,6 @@ async def validation_exception_handler(
             code="VALIDATION_ERROR",
             message="Request validation failed.",
             details=[d.model_dump() for d in details],
-            request_id=_get_request_id(request),
         )
     )
     return JSONResponse(status_code=422, content=body.model_dump())
@@ -87,7 +85,6 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
         error=ErrorBody(
             code="HTTP_ERROR",
             message=str(exc.detail),
-            request_id=_get_request_id(request),
         )
     )
     return JSONResponse(status_code=exc.status_code, content=body.model_dump())
@@ -108,7 +105,6 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
         error=ErrorBody(
             code="INTERNAL_SERVER_ERROR",
             message="An unexpected error occurred. Please try again later.",
-            request_id=_get_request_id(request),
         )
     )
     return JSONResponse(status_code=500, content=body.model_dump())

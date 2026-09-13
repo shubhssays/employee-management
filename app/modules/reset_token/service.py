@@ -48,7 +48,7 @@ class ResetTokenService:
                 return ResetTokenResponse(url=url)
 
             url = create_reset_token_url(str(existing_token.token))
-            return ResetTokenResponse(url=url)
+            return ResetTokenResponse(url=url)  # In future, we will send this url into the email
 
     async def verify_token(self, token: str) -> bool:
         async with self.db.begin():
