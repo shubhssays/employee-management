@@ -53,21 +53,19 @@ class Settings(BaseSettings):
     # -------------------------------------------------------------------------
     JWT_SECRET_KEY: str = "CHANGE_ME_IN_PRODUCTION"
     JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     PASSWORD_RESET_TOKEN_EXPIRE_HOURS: int = 1
 
     # -------------------------------------------------------------------------
     # Email
     # -------------------------------------------------------------------------
-    EMAIL_PROVIDER: Literal["smtp", "sendgrid", "resend"] = "smtp"
-    EMAIL_FROM_ADDRESS: str = "noreply@example.com"
-    EMAIL_FROM_NAME: str = "Employee Management"
-    SMTP_HOST: str = "localhost"
-    SMTP_PORT: int = 1025
-    SMTP_USER: str = ""
-    SMTP_PASSWORD: str = ""
-    SMTP_TLS: bool = False
+    EMAIL_PROVIDER: Literal["smtp"] = "smtp"
+    SENDER_EMAIL: str = "noreply@example.com"
+    SENDER_NAME: str = "Employee Management"
+    SMTP_SERVER: str
+    SMTP_PORT: int
+    SENDER_APP_PASSWORD: str
 
     # -------------------------------------------------------------------------
     # CORS
