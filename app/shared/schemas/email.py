@@ -1,12 +1,9 @@
-from typing import TypedDict, Optional
-
-from pydantic import EmailStr
-from typing_extensions import Required
+from pydantic import EmailStr, BaseModel, Field
 
 
-class EmailPayload(TypedDict):
-    receiver_email: Required[EmailStr]
-    subject: Required[str]
-    complete_filepath: Optional[str]
-    text_body: Optional[str]
-    html_body: Optional[str]
+class EmailPayload(BaseModel):
+    receiver_email: list[EmailStr] | EmailStr = Field(description="List of receivers")
+    subject: str = Field(description="Subject of email")
+    complete_filepath: str | None = Field(default=None, description="Complete filepath of attachment")
+    text_body: str | None = Field(default=None, description="Text of email")
+    html_body: str | None = Field(default=None, description="HTML of email")

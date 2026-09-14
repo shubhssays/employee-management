@@ -1,9 +1,11 @@
+import json
 from datetime import datetime, timedelta, timezone
+from uuid import uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
-from app.core.email import send_email
+from app.core.enums import TASK_TYPE
 from app.core.logging import get_logger
 from app.core.security import hash_password, generate_opaque_token, hash_opaque_token
 from app.modules.employees.exceptions import EmployeeNotFoundError
@@ -13,7 +15,9 @@ from app.modules.reset_token.models import ResetToken
 from app.modules.reset_token.repository import ResetTokenRepository
 from app.modules.reset_token.schemas import ResetTokenResponse, EmployeeToken, \
     ResetTokenChangePassword
+from app.modules.task_queue.repository import TaskQueueRepository
 from app.shared.schemas.email import EmailPayload
+from app.shared.schemas.worker import AddTask
 
 logger = get_logger(__name__)
 
@@ -29,6 +33,7 @@ class ResetTokenService:
         self.db = db
         self.repo = ResetTokenRepository(db)
         self.emp_repo = EmployeeRepository(db)
+        self.tq_repo = TaskQueueRepository(db)
 
     async def change_password(self, email: str) -> ResetTokenResponse:
         logger.info("password_reset_requested", email=email)
@@ -56,14 +61,23 @@ class ResetTokenService:
             url = create_reset_token_url(token)
             logger.info("reset_token_created", emp_id=existing_emp.id)
 
-            # Sending email
+            # Add email to task queue
             email_dict: EmailPayload = {
                 "receiver_email": existing_emp.email,
                 "subject": "Password Reset Link",
                 "text_body": f"Your password reset link is - {url}"
             }
-            send_email(email_dict)
 
+            send_email_payload = EmailPayload(**email_dict)
+
+            add_task_dict = {
+                "identifier": str(uuid4()),
+                "task_type": TASK_TYPE.SEND_EMAIL,
+                "payload": json.dumps(send_email_payload.model_dump()),
+            }
+
+            add_task_payload = AddTask(**add_task_dict)
+            await self.tq_repo.create(add_task_payload)
             return ResetTokenResponse(url=url)
 
     async def verify_token(self, token: str) -> bool:

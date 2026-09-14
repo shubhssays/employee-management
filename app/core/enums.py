@@ -49,3 +49,20 @@ class DepartmentType(enum.StrEnum):
     SUPPORT = "SUPPORT"
     HR = "HR"
     MANAGEMENT = "MANAGEMENT"
+
+
+class TASK_STATUS(enum.StrEnum):
+    QUEUED = "QUEUED"
+    PROCESSING = "PROCESSING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+
+
+class TASK_PRIORITY(enum.StrEnum):
+    HIGH = "HIGH"
+    MEDIUM = "MEDIUM"
+    LOW = "LOW"
+
+
+class TASK_TYPE(enum.StrEnum):
+    SEND_EMAIL = "SEND_EMAIL"

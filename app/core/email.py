@@ -25,11 +25,15 @@ def send_email(payload: EmailPayload) -> None:
     automatically after sending.
     """
 
-    text_body = payload.get("text_body")
-    html_body = payload.get("html_body")
-    receiver_email = payload.get("receiver_email")
-    subject = payload.get("subject")
-    complete_filepath = payload.get("complete_filepath")
+    text_body = payload.text_body
+    html_body = payload.html_body
+    receiver_email = payload.receiver_email
+    subject = payload.subject
+    complete_filepath = payload.complete_filepath
+
+    # Convert receiver_email
+    if type(receiver_email) is str:
+        receiver_email = [receiver_email]
 
     # Validate required fields
     if text_body is None and html_body is None:
@@ -48,6 +52,11 @@ def send_email(payload: EmailPayload) -> None:
     # ---------------------------------------------------------
     # Add email body
     # ---------------------------------------------------------
+
+    if text_body is None and html_body is None:
+        # Multipart alternative allows email clients to choose
+        # either the plain-text or HTML version.
+        raise ValueError("Either text_body or html_body should be present in the payload")
 
     if text_body is not None and html_body is not None:
         # Multipart alternative allows email clients to choose
@@ -124,7 +133,7 @@ def send_email(payload: EmailPayload) -> None:
             server.send_message(
                 message,
                 from_addr=SENDER_EMAIL,
-                to_addrs=[receiver_email],
+                to_addrs=receiver_email,
             )
 
             logger.info(

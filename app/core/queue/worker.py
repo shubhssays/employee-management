@@ -2,7 +2,7 @@ import json
 import time
 from datetime import datetime
 
-file_path = "/Users/shubhs/Desktop/shubhs/Developer/github/personal_projects/employee-management/test.json"
+file_path = "/test.json"
 
 
 class TaskWorker:
