@@ -53,6 +53,7 @@ def upgrade() -> None:
            status task_status DEFAULT 'QUEUED' NOT NULL,
            error_msg TEXT DEFAULT NULL,
            run_at TIMESTAMPTZ DEFAULT NULL,
+           processing_started_at TIMESTAMPTZ DEFAULT NULL,
            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
            updated_at TIMESTAMPTZ,
            CONSTRAINT uq_queues_identifier UNIQUE (identifier)

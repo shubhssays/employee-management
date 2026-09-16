@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from app.core.enums import TASK_TYPE, TASK_STATUS
+from app.core.enums import TASK_TYPE, TASK_STATUS, DB_CONSTANTS
 
 
 class AddTask(BaseModel):
@@ -21,6 +21,9 @@ class UpdateTask(BaseModel):
     attempts: int | None = Field(default=None, description="Current number of attempts for this job", gt=0)
     status: TASK_STATUS | None = Field(default=None, description="Describes the last status")
     error_msg: str | None = Field(default=None, description="Describes the error occurred during last processing")
-    run_at: datetime | None = Field(default=None, description="Describes the datetime when the task processing begins")
+    run_at: datetime | None = Field(default=None,
+                                    description="Describes the datetime after which the task processing should begins")
+    processing_started_at: datetime | DB_CONSTANTS | None = Field(default=None,
+                                                                  description="Describes the datetime when the task processing begins")
     updated_at: datetime | None = Field(default=None,
                                         description="Describes the datetime when the task processing begins")

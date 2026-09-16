@@ -66,3 +66,6 @@ class TASK_PRIORITY(enum.StrEnum):
 
 class TASK_TYPE(enum.StrEnum):
     SEND_EMAIL = "SEND_EMAIL"
+
+class DB_CONSTANTS(enum.StrEnum):
+    NOW = "NOW"

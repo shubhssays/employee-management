@@ -39,6 +39,7 @@ class TaskQueueRepository:
             "priority": task_queue.priority or TASK_PRIORITY.MEDIUM,
             "status": TASK_STATUS.QUEUED,
             "run_at": task_queue.run_at,
+            "processing_started_at": None,
             "error_msg": None
         }
         result = await self.db.execute(text(query_str), values)

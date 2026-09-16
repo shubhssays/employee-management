@@ -5,6 +5,7 @@ from app.shared.schemas.email import EmailPayload
 task_handler_func = {
     TASK_TYPE.SEND_EMAIL: {
         "schema": EmailPayload,
-        "handler": send_email
+        "handler": send_email,
+        "waiting_threshold_in_mins": 5
     }
 }

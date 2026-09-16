@@ -45,6 +45,7 @@ class TaskWorker:
             task_value_dict = {
                 "attempts": task["attempts"],
                 "status": TASK_STATUS.PROCESSING,
+                "processing_started_at": "NOW"
             }
 
             await self.update_task(task_value_dict, task)
