@@ -88,7 +88,7 @@ async def change_password(
     response = ResetTokenResponse.model_validate(change_password_response)
     return SuccessResponse(
         data=response,
-        message="Url generated successfully"
+        message="We have sent an email to you with password reset link"
     )
 
 
