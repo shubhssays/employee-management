@@ -46,7 +46,7 @@ def send_email(payload: EmailPayload) -> None:
     message = MIMEMultipart("mixed")
 
     message["From"] = SENDER_EMAIL
-    message["To"] = receiver_email
+    message["To"] = ", ".join(receiver_email) if isinstance(receiver_email, list) else receiver_email
     message["Subject"] = subject
 
     # ---------------------------------------------------------

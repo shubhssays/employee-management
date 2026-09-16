@@ -1,6 +1,10 @@
 from app.core.email import send_email
 from app.core.enums import TASK_TYPE
+from app.shared.schemas.email import EmailPayload
 
-handler_func = {
-    TASK_TYPE.SEND_EMAIL: send_email
+task_handler_func = {
+    TASK_TYPE.SEND_EMAIL: {
+        "schema": EmailPayload,
+        "handler": send_email
+    }
 }

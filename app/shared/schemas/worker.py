@@ -11,14 +11,16 @@ class AddTask(BaseModel):
     task_type: TASK_TYPE = Field(description="Describes what kind of task needs to be done. Eg - SEND_EMAIL")
     payload: str | None = Field(default=None,
                                 description="Default payload, mostly in json, need for the task to do processing")
-    attempts: int | None = Field(default=None, description="Number of attempts for this job", gt=0, lt=5)
-    max_attempts: int | None = Field(default=None, description="Maximum number of attempts for this job", gt=1, lt=5)
+    attempts: int | None = Field(default=None, description="Current number of attempts for this job", gt=0)
+    max_attempts: int | None = Field(default=None, description="Maximum number of attempts for this job", gt=1)
     priority: str | None = Field(default=None, description="Priority of task. Default is MEDIUM")
     run_at: datetime | None = Field(default=None, description="After what datetime should the task start")
 
 
-class updateTask(BaseModel):
-    max_attempts: int | None = Field(default=None, description="Maximum number of attempts for this job", gt=1, lt=5)
+class UpdateTask(BaseModel):
+    attempts: int | None = Field(default=None, description="Current number of attempts for this job", gt=0)
     status: TASK_STATUS | None = Field(default=None, description="Describes the last status")
     error_msg: str | None = Field(default=None, description="Describes the error occurred during last processing")
     run_at: datetime | None = Field(default=None, description="Describes the datetime when the task processing begins")
+    updated_at: datetime | None = Field(default=None,
+                                        description="Describes the datetime when the task processing begins")
