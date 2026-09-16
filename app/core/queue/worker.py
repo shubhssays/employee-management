@@ -154,11 +154,17 @@ class TaskWorker:
 
 
 async def main():
-    async with worker_db_engine.connect() as db:
-        task_worker1 = TaskWorker(db)
+    async with worker_db_engine.connect() as db1, \
+            worker_db_engine.connect() as db2, \
+            worker_db_engine.connect() as db3:
+        workers = [
+            TaskWorker(db1),
+            TaskWorker(db2),
+            TaskWorker(db3)
+        ]
 
-        # start the worker
-        await task_worker1.start()
+        # Run all workers concurrently
+        await asyncio.gather(*(w.start() for w in workers))
 
 
 asyncio.run(main())
