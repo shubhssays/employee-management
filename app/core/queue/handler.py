@@ -6,6 +6,6 @@ task_handler_func = {
     TASK_TYPE.SEND_EMAIL: {
         "schema": EmailPayload,
         "handler": send_email,
-        "waiting_threshold_in_mins": 5
+        "waiting_threshold_in_mins": 5,
     }
 }

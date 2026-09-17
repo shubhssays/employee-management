@@ -32,6 +32,7 @@ from app.api.exception_handlers import (
 )
 from app.api.v1.router import api_router
 from app.core.config import settings
+from app.core.crons.worker_cron import scheduler
 from app.core.exceptions import AppException
 from app.core.logging import configure_logging
 from app.middleware.logging import RequestLoggingMiddleware
@@ -75,10 +76,9 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
         logger.error("database_connection_failed", exc_info=exc)
         raise exc
 
-    # TODO (Phase 1 enhancement): Start APScheduler here
-    # if settings.SCHEDULER_ENABLED:
-    #     from app.scheduler import start_scheduler
-    #     start_scheduler()
+    if settings.SCHEDULER_ENABLED:
+        logger.info("Starting cron scheduler...")
+        scheduler.start()
 
     logger.info("application_ready")
 
@@ -86,8 +86,9 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
 
     # ── Shutdown ──────────────────────────────────────────────────────────
     logger.info("application_shutting_down")
-
-    # TODO: Stop APScheduler here
+    if settings.SCHEDULER_ENABLED:
+        logger.info("Stopping cron scheduler...")
+        scheduler.shutdown(wait=False)
     # TODO: Close database engine pool explicitly if needed
 
     logger.info("application_stopped")

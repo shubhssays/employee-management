@@ -4,6 +4,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.enums import TASK_PRIORITY, TASK_STATUS
+from app.core.queue.handler import task_handler_func
 from app.core.security import generate_opaque_token
 from app.db.utils import build_sql_values_clause_for_insert, build_sql_set_clause_for_update, build_sql_where_clause, \
     rows_to_dict_list
@@ -77,3 +78,44 @@ class TaskQueueRepository:
         result = await self.db.execute(text(query_str), values)
         rows = result.fetchall()
         return rows_to_dict_list(rows)
+
+    async def get_stucked_jobs(self) -> dict[Any, Any] | list[Any] | None:
+        columns = "*"
+        task_threshold_list = [{"task_type": tt, "waiting_threshold_in_mins": value["waiting_threshold_in_mins"]} for
+                               tt, value in task_handler_func.items()]
+
+        case_str = ""
+
+        for index, task_threshold in enumerate(task_threshold_list):
+            case_str += f""" WHEN  task_type = '{task_threshold.get("task_type")}' THEN  processing_started_at < (NOW() - INTERVAL '{task_threshold.get("waiting_threshold_in_mins")} minutes') \n"""
+
+        case_str += " ELSE processing_started_at < (NOW() - INTERVAL '2 minutes') \n"
+        case_str = f""" 
+                    CASE
+                        {case_str}
+                    END
+                    """
+
+        query_str = f"""SELECT {columns} FROM {table_name} WHERE status = :status AND {case_str} """
+        values = {
+            "status": TASK_STATUS.PROCESSING
+        }
+        result = await self.db.execute(text(query_str), values)
+        rows = result.fetchall()
+        return rows_to_dict_list(rows, True)
+
+    async def update_stucked_jobs(self, task_ids: list[int]) -> None:
+        case_str = ""
+
+        task_type_list = [task_field for task_field, task_value in task_handler_func.items()]
+
+        for task_type in task_type_list:
+            case_str += f" WHEN task_type = '{task_type}' AND processing_started_at + INTERVAL '{task_handler_func[task_type]["waiting_threshold_in_mins"]} minutes' < NOW() THEN '{TASK_STATUS.QUEUED}' \n \n"
+
+        case_str += "ELSE status"
+
+        query_str = f""" UPDATE {table_name} SET status = CASE \n {case_str} \n END WHERE ID = ANY(:task_ids)"""
+        values = {
+            "task_ids": task_ids,
+        }
+        await self.db.execute(text(query_str), values)

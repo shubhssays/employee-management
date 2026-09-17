@@ -344,11 +344,11 @@ def build_sql_where_clause(condition: dict) -> dict:
     }
 
 
-def rows_to_dict_list(rows: Any) -> dict | list | None:
+def rows_to_dict_list(rows: Any, list_only: bool = False) -> dict | list | None:
     if not rows:
         return None
 
-    if len(rows) == 1:
+    if list_only is False and len(rows) == 1:
         return dict(rows[0]._mapping)
 
     return [dict(row._mapping) for row in rows]

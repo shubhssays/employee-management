@@ -86,8 +86,6 @@ class Settings(BaseSettings):
     # Scheduler (background jobs)
     # -------------------------------------------------------------------------
     SCHEDULER_ENABLED: bool = True
-    ABSENCE_MARK_CRON: str = "30 23 * * *"
-    LEAVE_ALLOCATION_CRON: str = "5 0 1 * *"
 
     # -------------------------------------------------------------------------
     # Derived helpers
